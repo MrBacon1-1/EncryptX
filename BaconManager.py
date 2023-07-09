@@ -36,9 +36,9 @@ MAIN_MENU = f"""
                 .^7??7!~^:^^~!!~..5P??GP~!!!!!!!!!!!!~^..7P5PJ              |          <Key Binds>
              .!?7~^^^^^~~!!!!~:..JGJ?5P::::::::::::...:75P5P^               |           
            .JJ~::^~~!!!!~~^:..:7P5??5B7!7??777!!!!!7?YPPP5~                 |            
-         :5B~:^~!!!!~^:.:^!7JY5YJ?YGBPY555555555PPPPP5Y7:                   |           Ctrl + L ~> Log Out
+         :5B~:^~!!!!~^:.:^!7JY5YJ?YGBPY555555555PPPPP5Y7:                   |           Ctrl + E ~> Exit
         ?JP?:~!!!!^..^?Y555YYYYYP#GYJY5Y7~^^^~~!!~~:.                       |            
-        B^55~!!!~..^5PYJY5YJ?!~7G5?YP7.                                     |           Ctrl + E ~> Exit (Recommended Instead Of Log Out)
+        B^55~!!!~..^5PYJY5YJ?!~7G5?YP7.                                     |             
         YY!PP7!~..7GY?5BJ~^^^!YPJYP?.                                       |            
          G7^~J5!.~BJ?5B5YY555YY55?.                                         |
          .P:.7GP5#GJJBGYYY555Y?^                                            |
@@ -71,16 +71,14 @@ def decryption(key, ciphertext):
 
     return plaintext.decode()
 
-def logout_bind():
-   login()
-
 def exit_bind():
-   sys.exit()
+   pid = os.getpid()
+   os.system(f"taskkill /F /PID {pid}")
 
 def main_cli():
     os.system("cls")
     os.system(f"title Bacon Manager v1.0 ~ Logged In As {username} ")
-    os.system("mode con:cols=140 lines=42")
+    os.system("mode con:cols=144 lines=42")
     print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
     opt = input(colorama.Fore.LIGHTCYAN_EX + "  BaconManager/Console/.. " + colorama.Fore.RESET)
 
@@ -123,8 +121,7 @@ def login_creation():
     global key, username
 
     os.system("cls & title Bacon Manager v1.0 ~ Account Creation")
-    print(colorama.Fore.RED + "\nYour username must be minimum 8 characters long!" + colorama.Fore.RESET)
-    print(colorama.Fore.RED + "Your password must be minimum 8 characters long!\n" + colorama.Fore.RESET)
+    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
@@ -182,7 +179,6 @@ def login():
 def boot():
     global style
 
-    keyboard.add_hotkey('Ctrl+L', logout_bind)
     keyboard.add_hotkey('Ctrl+E', exit_bind)
 
     os.system(f"title Bacon Manager v1.0 & mode con:cols=80 lines=16")
