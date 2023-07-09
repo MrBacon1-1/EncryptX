@@ -4,3 +4,7 @@ This is a password manager im using for a school project it is made in python an
 # How do I use the program?
 
 Download the password manager through the releases. It will be a exe file and all you need to do is run it and everything should work. If you encounter any issues please open a issue!
+
+# Support Me
+
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'M4M1IG3UQ');kofiwidget2.draw();</script> 
