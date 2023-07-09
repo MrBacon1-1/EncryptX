@@ -1,5 +1,5 @@
 # Bacon-Manager
-This is a password manager im using for a school project it is made in python and has AES encryption to ensure data is stored securelly! It allows users to use either CLI or GUI by just choosing one on startup.
+This is a password manager im using for a school project it is made in python and has AES encryption to ensure data is stored securely! It allows users to use either CLI or GUI by just choosing one on startup.
 
 # How do I use the program?
 
