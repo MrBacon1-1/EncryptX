@@ -6,7 +6,6 @@ from cryptography.hazmat.backends import default_backend
 import hashlib
 import time
 import keyboard
-import sys
 
 
 MAIN_MENU = f"""                                                        
