@@ -74,6 +74,18 @@ def exit_bind():
    pid = os.getpid()
    os.system(f"taskkill /F /PID {pid}")
 
+def add_password(url_or_program, user, password):
+   encrypted_password = encryption(key, password)
+   encrypted_username = encryption(key, user)
+
+   with open("Passwords.txt", "a") as p:
+      p.write(f"{url_or_program}:{encrypted_username}:{encrypted_password}\n")
+      p.close()
+
+def get_passwords():
+   passwords = {}
+   # Not Done
+
 def main_cli():
     os.system("cls")
     os.system(f"title Bacon Manager v1.0 ~ Logged In As {username} ")
@@ -90,15 +102,22 @@ def main_cli():
        main_cli()
 
     elif opt == "2":
+       os.system("cls & mode con:cols=80 lines=16")
+       url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
+       user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
+       password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
+       add_password(url_or_program, user, password)
        main_cli()
 
     elif opt == "3":
        main_cli()
 
     elif opt == "4":
+       os.system("start https://youtu.be/dQw4w9WgXcQ")
        main_cli()
 
     elif opt == "5":
+       os.system("start https://discord.gg/cf9mxTgDFa")
        main_cli()
 
     elif opt == "6":
@@ -144,7 +163,7 @@ def login_creation():
        main_gui()
 
 def login():
-    global username
+    global username, key
 
     os.system(f"title Bacon Manager v1.0 & mode con:cols=80 lines=16")
     os.system("cls")
