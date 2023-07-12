@@ -6,6 +6,7 @@ from cryptography.hazmat.backends import default_backend
 import hashlib
 import time
 import keyboard
+from tabulate import tabulate
 
 
 MAIN_MENU = f"""                                                        
@@ -83,8 +84,7 @@ def add_password(url_or_program, user, password):
       p.close()
 
 def get_passwords():
-   passwords = {}
-   # Not Done
+    passwords = []
 
 def main_cli():
     os.system("cls")
@@ -99,6 +99,7 @@ def main_cli():
        main_cli()
 
     elif opt == "1":
+       get_passwords()
        main_cli()
 
     elif opt == "2":
