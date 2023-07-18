@@ -78,13 +78,32 @@ def exit_bind():
 def add_password(url_or_program, user, password):
    encrypted_password = encryption(key, password)
    encrypted_username = encryption(key, user)
+   encrypted_url_or_program = encryption(key, url_or_program)
 
    with open("Passwords.txt", "a") as p:
-      p.write(f"{url_or_program}:{encrypted_username}:{encrypted_password}\n")
+      p.write(f"{encrypted_url_or_program}:{encrypted_username}:{encrypted_password}\n")
       p.close()
 
 def get_passwords():
-    passwords = []
+    ready_data = []
+
+    with open("Passwords.txt", "r") as read:
+       split_data = read.read().split("\n")
+       read.close()
+
+    for data in split_data:
+      ready_data.append([decryption(key, eval(data.split(":")[0])), decryption(key, eval(data.split(":")[1])), decryption(key, eval(data.split(":")[2]))])
+
+
+    print(ready_data)
+    input()
+
+    if style == "cli":
+       main_cli()
+    elif style == "gui":
+       main_gui()
+             
+       
 
 def main_cli():
     os.system("cls")
