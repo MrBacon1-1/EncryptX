@@ -69,33 +69,44 @@ def decryption(key, ciphertext):
     unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
     plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
 
-    return plaintext.decode()
+    return plaintext
 
 def exit_bind():
    pid = os.getpid()
    os.system(f"taskkill /F /PID {pid}")
 
 def add_password(url_or_program, user, password):
-   encrypted_password = encryption(key, password)
-   encrypted_username = encryption(key, user)
-   encrypted_url_or_program = encryption(key, url_or_program)
+    encrypted_password = encryption(key, password)
+    encrypted_username = encryption(key, user)
+    encrypted_url_or_program = encryption(key, url_or_program)
 
-   with open("Passwords.txt", "a") as p:
-      p.write(f"{encrypted_url_or_program}:{encrypted_username}:{encrypted_password}\n")
-      p.close()
+    with open("Passwords.txt", "ab") as p:
+        p.write(encrypted_url_or_program + b":" + encrypted_username + b":" + encrypted_password + b"\n")
 
 def get_passwords():
     ready_data = []
 
-    with open("Passwords.txt", "r") as read:
-       split_data = read.read().split("\n")
-       read.close()
+    with open("Passwords.txt", "rb") as read:
+        split_data = read.read().split(b"\n")
+        read.close()
 
     for data in split_data:
-      ready_data.append([decryption(key, eval(data.split(":")[0])), decryption(key, eval(data.split(":")[1])), decryption(key, eval(data.split(":")[2]))])
-
-
-    print(ready_data)
+        if data:
+            url_or_program_ciphertext, user_ciphertext, password_ciphertext = data.split(b":")
+            url_or_program = decryption(key, url_or_program_ciphertext).decode()
+            user = decryption(key, user_ciphertext).decode()
+            password = decryption(key, password_ciphertext).decode()
+            ready_data.append([url_or_program, user, password])
+            
+    for ind, x in enumerate(ready_data):
+        x.insert(0, ind) 
+    
+    table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password"], tablefmt="double_grid")
+    
+    lenght = len(table_to_print.split("\n")[0])
+    
+    os.system(f"cls && mode con:cols={lenght} lines=48")
+    print(table_to_print)
     input()
 
     if style == "cli":
