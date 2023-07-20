@@ -26,9 +26,9 @@ MAIN_MENU = f"""
                                          !5^::~!!:.JG?55                    |
                                      .^7J!::^~!!:.~BJ?G?                    |           3 ~> Remove Password
                                  .~7?7!^^^~!!!^..7GJ?JB.                    |
-                               ^J?~^^^~!!!!^:..~5PJ?JB^ 77^                 |           4 ~> Visit Our Website
+                               ^J?~^^^~!!!!^:..~5PJ?JB^ 77^                 |           4 ~> Password Generator
                               7Y^:^~!!!~^:.:~?55J?J5G~^5~^YY                |
-                             ~P::~!!~^..:!Y55YJJY557.7Y^^~~JP               |           5 ~> Join Our Discord Server
+                             ~P::~!!~^..:!Y55YJJY557.7Y^^~~JP               |           5 ~> Join My Discord Server
                             .G^:^!!^..!5PYJJJYYJ7^.~Y!:^!!!!?5              |           
                             P7:^!!:.^PPJ?YPBGJ!~~7?!^^~!!!!^.PY             |           6 ~> Exit
                           ~5!:^~!:.~BY?JG5!~~~~~~^^^~!!!!~:.YP#.            |   
@@ -75,14 +75,6 @@ def exit_bind():
    pid = os.getpid()
    os.system(f"taskkill /F /PID {pid}")
 
-def add_password(url_or_program, user, password):
-    encrypted_password = encryption(key, password)
-    encrypted_username = encryption(key, user)
-    encrypted_url_or_program = encryption(key, url_or_program)
-
-    with open("Passwords.txt", "ab") as p:
-        p.write(encrypted_url_or_program + b":" + encrypted_username + b":" + encrypted_password + b"\n")
-
 def get_passwords():
     ready_data = []
 
@@ -106,15 +98,39 @@ def get_passwords():
     lenght = len(table_to_print.split("\n")[0])
     
     os.system(f"cls && mode con:cols={lenght} lines=48")
-    print(table_to_print)
+    print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
     input()
 
     if style == "cli":
        main_cli()
     elif style == "gui":
        main_gui()
-             
+
+def add_password(url_or_program, user, password):
+    encrypted_password = encryption(key, password)
+    encrypted_username = encryption(key, user)
+    encrypted_url_or_program = encryption(key, url_or_program)
+
+    with open("Passwords.txt", "ab") as p:
+        p.write(encrypted_url_or_program + b":" + encrypted_username + b":" + encrypted_password + b"\n")            
        
+def remove_password(index):
+   with open("Passwords.txt", "rb") as read:
+      lines = read.readlines()
+      print(lines)
+      read.close()
+   with open("Passwords.txt", "wb") as write:
+      for index_of_line, line in enumerate(lines):
+         if index_of_line != index:
+            print(index_of_line)
+            write.write(line)
+
+   input()
+
+   if style == "cli":
+      main_cli()
+   elif style == "gui":
+      main_gui()
 
 def main_cli():
     os.system("cls")
@@ -141,10 +157,11 @@ def main_cli():
        main_cli()
 
     elif opt == "3":
+       index = input("Index Of Password To Remove ~> ")
+       remove_password(index)
        main_cli()
 
     elif opt == "4":
-       os.system("start https://youtu.be/dQw4w9WgXcQ")
        main_cli()
 
     elif opt == "5":
@@ -166,7 +183,7 @@ def main_gui():
     input("Work In Progress")
     exit()
 
-def login_creation():
+def login_creation_cli():
     global key, username
 
     os.system("cls & title Bacon Manager v1.0 ~ Account Creation")
@@ -175,10 +192,10 @@ def login_creation():
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
     if len(username) < 8:
-      login_creation()
+      login_creation_cli()
       print(len(username))
     if len(master_pass) < 8 or master_pass != second_entry:
-      login_creation()
+      login_creation_cli()
       print(len(master_pass))
 
     key = username[0:8] + master_pass[0:8]
@@ -193,7 +210,7 @@ def login_creation():
     if style == "gui":
        main_gui()
 
-def login():
+def login_cli():
     global username, key
 
     os.system(f"title Bacon Manager v1.0 & mode con:cols=80 lines=16")
@@ -204,7 +221,7 @@ def login():
     if len(master_pass) < 8 or len(username) < 8:
       print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
       time.sleep(2)
-      login()
+      login_cli()
 
     key = username[0:8] + master_pass[0:8]
     encrypted_password = encryption(key, master_pass)
@@ -223,7 +240,7 @@ def login():
              
     print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
     time.sleep(2)
-    login()
+    login_cli()
 
 def boot():
     global style
@@ -257,8 +274,8 @@ def boot():
       else:
         with open("Passwords.txt", "w") as c:
           c.close()
-      login_creation()
-    login()
+      login_creation_cli()
+    login_cli()
 
 if __name__=="__main__":
     boot()
