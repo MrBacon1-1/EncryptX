@@ -154,6 +154,8 @@ def main_cli():
        url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
        user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
        password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
+       if "|" in password or "~" in password:
+         main_cli()
        add_password(url_or_program, user, password)
        main_cli()
 
@@ -194,10 +196,10 @@ def login_creation_cli():
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
     if len(username) < 8:
       login_creation_cli()
-      print(len(username))
     if len(master_pass) < 8 or master_pass != second_entry:
       login_creation_cli()
-      print(len(master_pass))
+    if "|" in master_pass or "~" in master_pass:
+      login_creation_cli()
 
     key = username[0:8] + master_pass[0:8]
     encrypted_password = encryption(key, master_pass)
