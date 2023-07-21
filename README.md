@@ -9,6 +9,8 @@ Otherwise you can download the python file on its own and run the command below:
 
 `pip install tabulate colorama cryptography hashlib keyboard`
 
+There is no actuall release yet as its constantly bieng worked on and there is still features missing! (The main features do work e.g storing, viewing and the removal of passwords)
+
 <p align="center">
   <b>~ Support Me ~</b><br><br>
 </p>
