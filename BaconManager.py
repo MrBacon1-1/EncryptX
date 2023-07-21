@@ -84,7 +84,7 @@ def get_passwords():
 
     for data in split_data:
         if data:
-            url_or_program_ciphertext, user_ciphertext, password_ciphertext = data.split(b"ب")
+            url_or_program_ciphertext, user_ciphertext, password_ciphertext = data.split(b"04n$b3e0R5K*")
             url_or_program = decryption(key, url_or_program_ciphertext).decode()
             user = decryption(key, user_ciphertext).decode()
             password = decryption(key, password_ciphertext).decode()
@@ -112,7 +112,7 @@ def add_password(url_or_program, user, password):
     encrypted_url_or_program = encryption(key, url_or_program)
 
     with open("Passwords.txt", "ab") as p:
-        p.write(encrypted_url_or_program + b"ب" + encrypted_username + b"ب" + encrypted_password + b"\n")            
+        p.write(encrypted_url_or_program + b"04n$b3e0R5K*" + encrypted_username + b"04n$b3e0R5K*" + encrypted_password + b"\n")            
        
 def remove_password(index):
    with open("Passwords.txt", "rb") as read:
@@ -232,7 +232,7 @@ def login_cli():
        r.close()
     
     for user in userdata:
-       if user.split("ب")[0] == username and user.split("ب")[1] == hash_password:
+       if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
           if style == "cli":
              main_cli()
           elif style == "gui":
