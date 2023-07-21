@@ -202,7 +202,7 @@ def login_creation_cli():
     encrypted_password = encryption(key, master_pass)
     hash_password = hashlib.md5(encrypted_password).hexdigest()
     with open("UserData.txt", "w") as w:
-       w.write(f"{username}:{hash_password}")
+       w.write(f"{username}04n$b3e0R5K*{hash_password}")
        w.close()
 
     if style == "cli":
