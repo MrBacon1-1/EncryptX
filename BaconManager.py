@@ -97,7 +97,7 @@ def get_passwords():
     
     lenght = len(table_to_print.split("\n")[0])
     
-    os.system(f"cls && mode con:cols={lenght} lines=48")
+    os.system(f"cls && mode con:cols={lenght} lines=9999")
     print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
     input()
 
