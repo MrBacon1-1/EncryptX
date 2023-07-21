@@ -4,6 +4,7 @@ This is a password manager im using for a school project it is made in python an
 # How do I use the program?
 
 Download the password manager through the releases. It will be a exe file and all you need to do is run it and everything should work. If you encounter any issues please open a issue!
+
 Otherwise you can download the python file on its own and run the command below:
 
 `pip install tabulate colorama cryptography hashlib keyboard`
