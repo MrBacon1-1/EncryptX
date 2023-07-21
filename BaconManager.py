@@ -121,7 +121,7 @@ def remove_password(index):
       read.close()
    with open("Passwords.txt", "wb") as write:
       for index_of_line, line in enumerate(lines):
-         if index_of_line != index:
+         if index_of_line != int(index):
             print(index_of_line)
             write.write(line)
 
