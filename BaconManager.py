@@ -150,11 +150,13 @@ def main_cli():
 
     elif opt == "2":
        os.system("cls & mode con:cols=80 lines=16")
-       print(colorama.Fore.RED + "Your username or password must not contain '|' or '~'" + colorama.Fore.RESET)
+       print(colorama.Fore.RED + "Your username or password must not contain '|' or '~'.\nYour name, username or password must not be longer than 50.\n" + colorama.Fore.RESET)
        url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
        user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
        password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
        if "|" in password or "~" in password:
+         main_cli()
+       if len(password) > 50 or len(user) > 50 or len(url_or_program) > 50:
          main_cli()
        add_password(url_or_program, user, password)
        main_cli()
@@ -190,7 +192,7 @@ def login_creation_cli():
     global key, username
 
     os.system("cls & title Bacon Manager v1.0 ~ Account Creation")
-    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\nYour username or password must not contain '|' or '~'\n" + colorama.Fore.RESET)
+    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\nYour username or password must not contain '|' or '~'\nYour username or password must not be longer than 50.\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
@@ -199,6 +201,8 @@ def login_creation_cli():
     if len(master_pass) < 8 or master_pass != second_entry:
       login_creation_cli()
     if "|" in master_pass or "~" in master_pass:
+      login_creation_cli()
+    if len(master_pass) > 50 or len(username) > 50:
       login_creation_cli()
 
     key = username[0:8] + master_pass[0:8]
