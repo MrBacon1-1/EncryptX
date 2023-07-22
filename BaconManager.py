@@ -7,6 +7,8 @@ import hashlib
 import time
 import keyboard
 from tabulate import tabulate
+import pyperclip
+import random
 
 
 MAIN_MENU = f"""                                                        
@@ -162,11 +164,28 @@ def main_cli():
        main_cli()
 
     elif opt == "3":
-       index = input("Index Of Password To Remove ~> ")
+       os.system("cls & mode con:cols=80 lines=16")
+       index = input(colorama.Fore.LIGHTCYAN_EX + "\nIndex Of Password To Remove ~> " + colorama.Fore.RESET)
        remove_password(index)
        main_cli()
 
     elif opt == "4":
+       os.system("cls & mode con:cols=80 lines=16")
+       while True:
+         length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Lenght ~> " + colorama.Fore.RESET))
+         characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
+         generated_password = ""
+         for i in range(length):
+            generated_password += random.choice(characters)
+         print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
+         opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
+         if opt.lower() == "y":
+            pyperclip.copy(generated_password)
+            print(colorama.Fore.LIGHTCYAN_EX + "Password Copied To Your Clip Board!" + colorama.Fore.RESET)
+            time.sleep(2)
+            break
+         else:
+            continue
        main_cli()
 
     elif opt == "5":
