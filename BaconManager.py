@@ -7,7 +7,7 @@ import hashlib
 import time
 import keyboard
 from tabulate import tabulate
-import paperclip
+import pyperclip
 import random
 
 
@@ -180,7 +180,7 @@ def main_cli():
          print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
          opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
          if opt.lower() == "y":
-            paperclip.copy(generated_password)
+            pyperclip.copy(generated_password)
             print(colorama.Fore.LIGHTCYAN_EX + "Password Copied To Your Clip Board!" + colorama.Fore.RESET)
             time.sleep(2)
             break
