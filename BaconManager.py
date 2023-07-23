@@ -348,7 +348,11 @@ def boot():
     if new_user == True and style == "cli":
        login_creation_cli()
     elif new_user == True and style == "gui":
-       login_creation_gui()
+       opt = input("GUI is not currently finished are you sure you want to continue? (Y/N)")
+       if opt.lower() == "y": 
+         login_creation_gui()
+       else:
+          exit()
     elif new_user == False and style == "cli":
        login_cli()
     elif new_user == False and style == "gui":
