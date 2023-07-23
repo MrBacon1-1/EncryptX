@@ -11,7 +11,8 @@ import keyboard
 from tabulate import tabulate
 import pyperclip
 import random
-
+import customtkinter
+import base64
 
 MAIN_MENU = f"""                                                        
                                          _____                    _____                         
@@ -115,10 +116,11 @@ def get_passwords():
 
     for data in split_data:
         if data:
-            url_or_program_ciphertext, user_ciphertext, password_ciphertext = data.split(b"04n$b3e0R5K*")
-            url_or_program = decryption(key, url_or_program_ciphertext).decode()
-            user = decryption(key, user_ciphertext).decode()
-            password = decryption(key, password_ciphertext).decode()
+            url_or_program, user, password = data.split(b"04n$b3e0R5K*")
+            url_or_program, user, password = base64.b64decode(url_or_program), base64.b64decode(user), base64.b64decode(password)
+            url_or_program = decryption(key, url_or_program).decode()
+            user = decryption(key, user).decode()
+            password = decryption(key, password).decode()
             ready_data.append([url_or_program, user, password])
             
     for ind, x in enumerate(ready_data):
@@ -146,7 +148,7 @@ def add_password(url_or_program, user, password):
     time.sleep(0.2)
 
     with open("Passwords.txt", "ab") as p:
-        p.write(encrypted_url_or_program + b"04n$b3e0R5K*" + encrypted_username + b"04n$b3e0R5K*" + encrypted_password + b"\n")            
+        p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
        
 def remove_password(index):
    with open("Passwords.txt", "rb") as read:
@@ -166,7 +168,7 @@ def remove_password(index):
 
 def main_cli():
     os.system("cls")
-    os.system(f"title Bacon Manager v1.0 ~ Logged In As {username} ")
+    os.system(f"title Bacon Manager {version} ~ Logged In As {username} ")
     os.system("mode con:cols=144 lines=42")
     print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
     opt = input(colorama.Fore.LIGHTCYAN_EX + "  BaconManager/Console/.. " + colorama.Fore.RESET)
@@ -228,14 +230,26 @@ def main_cli():
     main_cli()
 
 def main_gui():
-    # Not Done
-    input("Work In Progress")
-    exit()
+    input()
+
+def login_creation_gui():
+   login = customtkinter.CTk()
+   login.geometry("400x500")
+   login.title(f"Bacon Manager {version} ~ Account Creation")  
+
+   login.mainloop()
+
+def login_gui():
+   login = customtkinter.CTk()
+   login.geometry("400x500")
+   login.title(f"Bacon Manager {version}")
+
+   login.mainloop()
 
 def login_creation_cli():
     global key, username
 
-    os.system("cls & title Bacon Manager v1.0 ~ Account Creation")
+    os.system(f"cls & title Bacon Manager {version} ~ Account Creation")
     print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
@@ -260,7 +274,7 @@ def login_creation_cli():
 def login_cli():
     global username, key
 
-    os.system(f"title Bacon Manager v1.0 & mode con:cols=80 lines=16")
+    os.system(f"title Bacon Manager {version} & mode con:cols=80 lines=16")
     os.system("cls")
     username = input(colorama.Fore.LIGHTCYAN_EX + "\nUsername ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
@@ -291,11 +305,12 @@ def login_cli():
     login_cli()
 
 def boot():
-    global style
+    global style, version
+    version = "v1.0"
 
     keyboard.add_hotkey('Ctrl+E', exit_bind)
 
-    os.system(f"title Bacon Manager v1.0 & mode con:cols=80 lines=16")
+    os.system(f"title Bacon Manager {version} & mode con:cols=80 lines=16")
     boot = input(colorama.Fore.LIGHTCYAN_EX + "Would you like to use CLI or GUI? " + colorama.Fore.RESET)
     if boot.lower() == "cli":
       style = "cli"
@@ -322,8 +337,17 @@ def boot():
       else:
         with open("Passwords.txt", "w") as c:
           c.close()
-      login_creation_cli()
-    login_cli()
+
+    if new_user == True and style == "cli":
+       login_creation_cli()
+    elif new_user == True and style == "gui":
+       login_creation_gui()
+    elif new_user == False and style == "cli":
+       login_cli()
+    elif new_user == False and style == "gui":
+       login_gui()
+    else:
+       exit()
 
 if __name__=="__main__":
     boot()

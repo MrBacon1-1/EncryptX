@@ -7,7 +7,7 @@ Download the password manager through the releases. It will be a exe file and al
 
 Otherwise you can download the python file on its own and run the command below:
 
-`pip install tabulate colorama cryptography pyperclip keyboard`
+`pip install tabulate colorama cryptography pyperclip keyboard customtkinter`
 
 There is no actuall release yet as its constantly being worked on and there is still features missing! (The main features do work e.g storing, viewing and the removal of passwords)
 
