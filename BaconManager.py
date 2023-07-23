@@ -3,6 +3,8 @@ import colorama
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
 import hashlib
 import time
 import keyboard
@@ -51,11 +53,35 @@ MAIN_MENU = f"""
 
 
 """
+
+def generate_key(master_password, salt):
+    backend = default_backend()
+    iterations = 100000
+
+    master_password_bytes = master_password.encode()
+    salt_bytes = salt.encode()
+
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=16,
+        salt=salt_bytes,
+        iterations=iterations,
+        backend=backend
+    )
+
+    key = kdf.derive(master_password_bytes)
+
+    return key.hex()
+
+
 def encryption(key, plaintext):
-    padder = padding.PKCS7(algorithms.AES.block_size).padder()
+    backend = default_backend()
+    block_size = algorithms.AES.block_size
+
+    padder = padding.PKCS7(block_size).padder()
     padded_plaintext = padder.update(plaintext.encode()) + padder.finalize()
 
-    cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=default_backend())
+    cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
     encryptor = cipher.encryptor()
 
     ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
@@ -63,12 +89,15 @@ def encryption(key, plaintext):
     return ciphertext
 
 def decryption(key, ciphertext):
-    cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=default_backend())
+    backend = default_backend()
+    block_size = algorithms.AES.block_size
+
+    cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
     decryptor = cipher.decryptor()
 
     padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
 
-    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+    unpadder = padding.PKCS7(block_size).unpadder()
     plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
 
     return plaintext
@@ -110,8 +139,11 @@ def get_passwords():
 
 def add_password(url_or_program, user, password):
     encrypted_password = encryption(key, password)
+    time.sleep(0.2)
     encrypted_username = encryption(key, user)
+    time.sleep(0.2)
     encrypted_url_or_program = encryption(key, url_or_program)
+    time.sleep(0.2)
 
     with open("Passwords.txt", "ab") as p:
         p.write(encrypted_url_or_program + b"04n$b3e0R5K*" + encrypted_username + b"04n$b3e0R5K*" + encrypted_password + b"\n")            
@@ -119,12 +151,10 @@ def add_password(url_or_program, user, password):
 def remove_password(index):
    with open("Passwords.txt", "rb") as read:
       lines = read.readlines()
-      print(lines)
       read.close()
    with open("Passwords.txt", "wb") as write:
       for index_of_line, line in enumerate(lines):
          if index_of_line != int(index):
-            print(index_of_line)
             write.write(line)
 
    input()
@@ -152,14 +182,9 @@ def main_cli():
 
     elif opt == "2":
        os.system("cls & mode con:cols=80 lines=16")
-       print(colorama.Fore.RED + "Your username or password must not contain '|' or '~'.\nYour name, username or password must not be longer than 50.\n" + colorama.Fore.RESET)
        url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
        user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
        password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
-       if "|" in password or "~" in password:
-         main_cli()
-       if len(password) > 50 or len(user) > 50 or len(url_or_program) > 50:
-         main_cli()
        add_password(url_or_program, user, password)
        main_cli()
 
@@ -211,7 +236,7 @@ def login_creation_cli():
     global key, username
 
     os.system("cls & title Bacon Manager v1.0 ~ Account Creation")
-    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\nYour username or password must not contain '|' or '~'\nYour username or password must not be longer than 50.\n" + colorama.Fore.RESET)
+    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
@@ -219,12 +244,8 @@ def login_creation_cli():
       login_creation_cli()
     if len(master_pass) < 8 or master_pass != second_entry:
       login_creation_cli()
-    if "|" in master_pass or "~" in master_pass:
-      login_creation_cli()
-    if len(master_pass) > 50 or len(username) > 50:
-      login_creation_cli()
-
-    key = username[0:8] + master_pass[0:8]
+    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
+    key = generate_key(master_pass, salt)
     encrypted_password = encryption(key, master_pass)
     hash_password = hashlib.md5(encrypted_password).hexdigest()
     with open("UserData.txt", "w") as w:
@@ -249,7 +270,8 @@ def login_cli():
       time.sleep(2)
       login_cli()
 
-    key = username[0:8] + master_pass[0:8]
+    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
+    key = generate_key(master_pass, salt)
     encrypted_password = encryption(key, master_pass)
     hash_password = hashlib.md5(encrypted_password).hexdigest()
 
