@@ -159,8 +159,6 @@ def remove_password(index):
          if index_of_line != int(index):
             write.write(line)
 
-   input()
-
    if style == "cli":
       main_cli()
    elif style == "gui":
@@ -184,9 +182,14 @@ def main_cli():
 
     elif opt == "2":
        os.system("cls & mode con:cols=80 lines=16")
+       print(colorama.Fore.RED + "\nYour name, username or password can not be longer than 44 characters.\n" + colorama.Fore.RESET)
        url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
        user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
        password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
+
+       if len(password) > 44 or len(user) > 44 or len(url_or_program) > 44:
+          main_cli()
+
        add_password(url_or_program, user, password)
        main_cli()
 
@@ -250,14 +253,18 @@ def login_creation_cli():
     global key, username
 
     os.system(f"cls & title Bacon Manager {version} ~ Account Creation")
-    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long!\n" + colorama.Fore.RESET)
+    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long and cant be longer than 64 characters!\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
+
     if len(username) < 8:
       login_creation_cli()
     if len(master_pass) < 8 or master_pass != second_entry:
       login_creation_cli()
+    if len(master_pass) > 64 or len(username) > 64:
+       login_creation_cli()
+
     salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
     key = generate_key(master_pass, salt)
     encrypted_password = encryption(key, master_pass)
