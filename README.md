@@ -27,7 +27,7 @@
 
 - [Features](#features)
 - [Why I used AES encrytion](#why-i-used-aes-encrytion)
-- [How do I use the program?](#How-do-I-use-the-program?)
+- [How do I use the program?](#how-do-i-use-the-program?)
 - [Support the Project](#support-the-project)
   
 ## Features
