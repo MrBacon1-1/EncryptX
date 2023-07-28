@@ -50,7 +50,7 @@ Your feedback is valuable as it helps us refine the password manager further.
 
 This option requires Python to be installed on your system.
 To begin, make sure you have Python installed on your computer. 
-If you don't have it yet, you can easily download and install it from the official Python website [Python](https://www.python.org/).
+If you don't have it yet, you can easily download and install it from the official [Python](https://www.python.org/) website.
 Once Python is ready, you can download the Python file from our GitHub repository.
 To run the password manager, you will need to ensure a few Python packages are installed. Execute the following command in your terminal or command prompt:
 
