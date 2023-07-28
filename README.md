@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-   This is a password manager im using for a school project it is made in python and has AES encryption to ensure data is stored securely! It allows users to use either CLI or GUI by just choosing one on startup.
+   I've developed a robust password manager in Python that utilizes AES encryption to ensure the secure storage of sensitive data. The main goal of this password manager is to provide users with a reliable and convenient solution for managing their passwords effectively.
 </p>
   
 # Features
