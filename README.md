@@ -27,6 +27,8 @@
 
     • AES-128 Encryption.
     • CLI and GUI interface.
+    • Password generator.
+    • Keybinds.
 
 # Why I used AES encrytion?
 
