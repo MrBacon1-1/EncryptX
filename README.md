@@ -1,4 +1,22 @@
-# Bacon-Manager
+<h1 align="center">
+   Bacon Manager
+</h1>
+<p align= "center">
+   <kbd>
+   <img  src="https://raw.githubusercontent.com/MrBacon1-1/Bacon-Manager/main/src/BaconManager.jpg">
+   </kbd><br><br>
+   <img src="https://img.shields.io/github/languages/top/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/stars/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/forks/MrBacon1-1/Bacon-Manager">
+   <br>
+   <img src="https://img.shields.io/github/last-commit/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/license/MrBacon1-1/Bacon-Manager">
+   <br>
+   <img src="https://img.shields.io/github/issues/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/issues-closed/MrBacon1-1/Bacon-Manager">
+   <br>
+</p>
+
 This is a password manager im using for a school project it is made in python and has AES encryption to ensure data is stored securely! It allows users to use either CLI or GUI by just choosing one on startup.
 
 # Why I used AES encrytion.
