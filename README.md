@@ -28,8 +28,8 @@
 </h2>
 
     • AES-128 Encryption
-    • CLI and GUI interface
-    • Password generator
+    • CLI and GUI Interface
+    • Password Generator
     • Keybinds
 
 <h2 align="center">
