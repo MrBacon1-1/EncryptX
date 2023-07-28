@@ -68,7 +68,9 @@ We value your support and encouragement as we progress with this project.
 Your feedback, suggestions, and bug reports are vital in shaping the future of our password manager. 
 As we strive to create a robust and reliable solution, we appreciate your understanding and patience.
 
-# Support the Project
+<h2 align="center">
+   Support the Project!
+</h2>
 
 If you find this project useful and would like to show your support, you can make a donation using the following:
 <p><a href="https://ko-fi.com/mrbacon"> <img align="center" src="https://cdn.ko-fi.com/cdn/kofi3.png?v=3" height="50" width="210" alt="mrbacon" /></a></p><br><br>
