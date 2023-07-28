@@ -23,14 +23,18 @@
    I've developed a robust password manager in Python that utilizes AES encryption to ensure the secure storage of sensitive data. The main goal of this password manager is to provide users with a reliable and convenient solution for managing their passwords effectively.
 </p>
   
-# Features
+<h2 align="center">
+   Features
+</h2>
 
     • AES-128 Encryption
     • CLI and GUI interface
     • Password generator
     • Keybinds
 
-# Why I used AES encrytion?
+<h2 align="center">
+   Why I used AES encrytion?
+</h2>
 
 I chose to implement AES (Advanced Encryption Standard) encryption for my password manager due to its widely recognized reputation for robust security and reliability. As a crucial aspect of any password management system, data protection is paramount to safeguarding sensitive information. AES encryption employs a symmetric key algorithm, ensuring that my passwords are securely encrypted and decrypted using the same key. This allows for efficient and fast encryption and decryption processes while maintaining a high level of security. Additionally, AES has undergone extensive scrutiny and testing by cryptographic experts worldwide, making it one of the most trustworthy encryption methods available.
 
