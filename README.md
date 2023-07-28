@@ -15,6 +15,8 @@
    <img src="https://img.shields.io/github/issues/MrBacon1-1/Bacon-Manager">
    <img src="https://img.shields.io/github/issues-closed/MrBacon1-1/Bacon-Manager">
    <br>
+   <br>
+   <img src="https://repobeats.axiom.co/api/embed/3ad04931195c0e848b2080ec9f682680afa9fb8a.svg">
 </p>
 
 This is a password manager im using for a school project it is made in python and has AES encryption to ensure data is stored securely! It allows users to use either CLI or GUI by just choosing one on startup.
