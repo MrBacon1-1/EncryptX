@@ -47,8 +47,6 @@ There is no actuall release yet as its constantly being worked on and there is s
 # Support the Project
 
 If you find this project useful and would like to show your support, you can make a donation using the following:
-
 <p><a href="https://ko-fi.com/mrbacon"> <img align="center" src="https://cdn.ko-fi.com/cdn/kofi3.png?v=3" height="50" width="210" alt="mrbacon" /></a></p><br><br>
-
 Your contributions will help support ongoing development, maintenance, and improvement of this project. Thank you for your generosity!
 
