@@ -108,6 +108,7 @@ def exit_bind():
    os.system(f"taskkill /F /PID {pid}")
 
 def get_passwords():
+    global ready_data
     ready_data = []
 
     with open("Passwords.txt", "rb") as read:
@@ -125,19 +126,7 @@ def get_passwords():
             
     for ind, x in enumerate(ready_data):
         x.insert(0, ind) 
-    
-    table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password"], tablefmt="double_grid")
-    
-    lenght = len(table_to_print.split("\n")[0])
-    
-    os.system(f"cls && mode con:cols={lenght} lines=9999")
-    print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
-    input()
 
-    if style == "cli":
-       main_cli()
-    elif style == "gui":
-       main_gui()
 
 def add_password(url_or_program, user, password):
     encrypted_password = encryption(key, password)
@@ -159,10 +148,8 @@ def remove_password(index):
          if index_of_line != int(index):
             write.write(line)
 
-   if style == "cli":
-      main_cli()
-   elif style == "gui":
-      main_gui()
+def password_rating_check(password):
+   return 1
 
 def main_cli():
     os.system("cls")
@@ -178,6 +165,13 @@ def main_cli():
 
     elif opt == "1":
        get_passwords()
+       table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password"], tablefmt="double_grid")
+    
+       lenght = len(table_to_print.split("\n")[0])
+    
+       os.system(f"cls && mode con:cols={lenght} lines=9999")
+       print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
+       input()
        main_cli()
 
     elif opt == "2":
