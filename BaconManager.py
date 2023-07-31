@@ -122,7 +122,8 @@ def get_passwords():
             url_or_program = decryption(key, url_or_program).decode()
             user = decryption(key, user).decode()
             password = decryption(key, password).decode()
-            ready_data.append([url_or_program, user, password])
+            rating = password_rating_check(password)
+            ready_data.append([url_or_program, user, password, rating])
             
     for ind, x in enumerate(ready_data):
         x.insert(0, ind) 
@@ -149,7 +150,43 @@ def remove_password(index):
             write.write(line)
 
 def password_rating_check(password):
-   return 1
+    score = 0
+    lowercase_characters_present = uppercase_characters_present = special_characters_present = numbers_present = False
+
+    lowercase_characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    uppercase_characters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    special_characters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', '\\', ';', ':', "'", '"', ',', '.', '<', '>', '/', '?']
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+ 
+    for char in lowercase_characters:
+        if char in password:
+          lowercase_characters_present = True
+    for char in uppercase_characters:
+        if char in password:
+          uppercase_characters_present = True
+    for char in special_characters:
+        if char in password:
+          special_characters_present = True
+    for char in numbers:
+        if char in password:
+          numbers_present = True
+ 
+    if lowercase_characters_present == True:
+       score +=1
+
+    if uppercase_characters_present == True:
+       score +=1
+
+    if special_characters_present == True:
+       score +=1
+
+    if numbers_present == True:
+       score +=1
+
+    if len(password) >= 8:
+      score +=1
+
+    return score
 
 def main_cli():
     os.system("cls")
@@ -165,7 +202,7 @@ def main_cli():
 
     elif opt == "1":
        get_passwords()
-       table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password"], tablefmt="double_grid")
+       table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password", "Rating (1-5)"], tablefmt="double_grid")
     
        lenght = len(table_to_print.split("\n")[0])
     
@@ -176,12 +213,12 @@ def main_cli():
 
     elif opt == "2":
        os.system("cls & mode con:cols=80 lines=16")
-       print(colorama.Fore.RED + "\nYour name, username or password can not be longer than 44 characters.\n" + colorama.Fore.RESET)
+       print(colorama.Fore.RED + "\nYour name, username or password can not be longer than 50 characters.\n" + colorama.Fore.RESET)
        url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
        user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
        password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
 
-       if len(password) > 44 or len(user) > 44 or len(url_or_program) > 44:
+       if len(password) > 50 or len(user) > 50 or len(url_or_program) > 50:
           main_cli()
 
        add_password(url_or_program, user, password)
