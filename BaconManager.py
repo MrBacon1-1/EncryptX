@@ -227,19 +227,73 @@ def main_cli():
     main_cli()
 
 def main_gui():
-    input()
+   main = customtkinter.CTk()
+   main.geometry("400x300")
+   main.title(f"Bacon Manager {version} ~ Logged In As {username}")
+
+   main.mainloop()
+
+def login_check(master_pass, username):
+   salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
+   key = generate_key(master_pass, salt)
+   encrypted_password = encryption(key, master_pass)
+
+   hash_password = hashlib.md5(encrypted_password).hexdigest()
+   with open("UserData.txt", "r") as r:
+      userdata = r.read().split("\n")
+      r.close()
+   
+   for user in userdata:
+      if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
+         login.destroy()
+         main_gui()
+      else:
+         login.destroy()
+         exit()
+             
+
+def login_create():
+   input()
 
 def login_creation_gui():
+   global login, username
+
    login = customtkinter.CTk()
-   login.geometry("400x500")
-   login.title(f"Bacon Manager {version} ~ Account Creation")  
+   login.geometry("400x300")
+   login.title(f"Bacon Manager {version} ~ Account Creation")
+
+   title = customtkinter.CTkLabel(master=login, text="Bacon Manager", font=("Cascadia Code", 32))
+   title.pack(pady=20, padx=5)
+
+   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12))
+   username_box.pack(pady=20, padx=5)
+   password_box.pack(pady=5, padx=5)
+
+   username = username_box.get()
+
+   button = customtkinter.CTkButton(master=login, text="Create Account")
+   button.pack(pady=20, padx=5)
 
    login.mainloop()
 
 def login_gui():
+   global login, username
+
    login = customtkinter.CTk()
-   login.geometry("400x500")
-   login.title(f"Bacon Manager {version}")
+   login.geometry("400x300")
+   login.title(f"Bacon Manager {version} ~ Account Login")
+
+   title = customtkinter.CTkLabel(master=login, text="Bacon Manager", font=("Cascadia Code", 22))
+   title.pack(pady=20, padx=5)
+
+   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12))
+   username_box.pack(pady=20, padx=5)
+   password_box.pack(pady=5, padx=5)
+
+   button = customtkinter.CTkButton(master=login, text="Login", command=lambda:login_check(password_box.get(), username_box.get()))
+   button.pack(pady=20, padx=5)
 
    login.mainloop()
 
@@ -267,15 +321,12 @@ def login_creation_cli():
        w.write(f"{username}04n$b3e0R5K*{hash_password}")
        w.close()
 
-    if style == "cli":
        main_cli()
-    if style == "gui":
-       main_gui()
 
 def login_cli():
     global username, key
 
-    os.system(f"title Bacon Manager {version} & mode con:cols=80 lines=16")
+    os.system(f"title Bacon Manager {version} ~ Account Login & mode con:cols=80 lines=16")
     os.system("cls")
     username = input(colorama.Fore.LIGHTCYAN_EX + "\nUsername ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
@@ -296,11 +347,8 @@ def login_cli():
     
     for user in userdata:
        if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
-          if style == "cli":
-             main_cli()
-          elif style == "gui":
-             main_gui()
-             
+         main_cli()
+
     print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
     time.sleep(2)
     login_cli()
