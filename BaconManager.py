@@ -190,7 +190,7 @@ def password_rating_check(password):
 
 def main_cli():
     os.system("cls")
-    os.system(f"title Bacon Manager {version} ~ Logged In As {username} ")
+    os.system(f"title Bacon Manager {version} ~ Logged In As {username_} ")
     os.system("mode con:cols=144 lines=42")
     print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
     opt = input(colorama.Fore.LIGHTCYAN_EX + "  BaconManager/Console/.. " + colorama.Fore.RESET)
@@ -265,12 +265,24 @@ def main_cli():
 
 def main_gui():
    main = customtkinter.CTk()
-   main.geometry("400x300")
-   main.title(f"Bacon Manager {version} ~ Logged In As {username}")
+   main.geometry("900x700")
+   main.title(f"Bacon Manager {version} ~ Logged In As {username_}")
 
    main.mainloop()
 
 def login_check(master_pass, username):
+   global username_, key
+   username_ = username
+   
+   if len(master_pass) < 8 or len(username) < 8:
+      if style == "cli":
+         print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
+         time.sleep(2)
+         login_cli()
+      else:
+         login.destroy()
+         exit
+
    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
    key = generate_key(master_pass, salt)
    encrypted_password = encryption(key, master_pass)
@@ -282,18 +294,60 @@ def login_check(master_pass, username):
    
    for user in userdata:
       if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
-         login.destroy()
-         main_gui()
+         if style == "cli":
+            main_cli()
+         else:
+            login.destroy()
+            main_gui()
       else:
+         if style == "cli":
+            print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
+            time.sleep(2)
+            login_cli()
          login.destroy()
          exit()
              
+def login_create(master_pass, second_entry, username):
+   global username_, key
+   username_ = username
 
-def login_create():
-   input()
+   if len(username) < 8:
+     if style == "cli":
+        login_creation_cli()
+     else:
+        login.destroy()
+        exit()
+   if len(master_pass) < 8 or master_pass != second_entry:
+     if style == "cli":
+        login_creation_cli()
+     else:
+        login.destroy()
+        exit()
+   if len(master_pass) > 64 or len(username) > 64:
+     if style == "cli":
+        login_creation_cli()
+     else:
+        login.destroy()
+        exit()
+
+
+   salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
+   key = generate_key(master_pass, salt)
+   encrypted_password = encryption(key, master_pass)
+   hash_password = hashlib.md5(encrypted_password).hexdigest()
+
+   with open("UserData.txt", "w") as w:
+      w.write(f"{username}04n$b3e0R5K*{hash_password}")
+      w.close()
+
+   if style == "cli":
+      main_cli()
+   else:
+      login.destroy()
+      main_gui()
 
 def login_creation_gui():
-   global login, username
+   global login
 
    login = customtkinter.CTk()
    login.geometry("400x300")
@@ -304,18 +358,18 @@ def login_creation_gui():
 
    username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12))
+   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 12))
    username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
+   second_password_box.pack(pady=5, padx=5)
 
-   username = username_box.get()
-
-   button = customtkinter.CTkButton(master=login, text="Create Account")
+   button = customtkinter.CTkButton(master=login, text="Create Account", command=lambda:login_create(password_box.get(), second_password_box.get(), username_box.get()))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
 
 def login_gui():
-   global login, username
+   global login
 
    login = customtkinter.CTk()
    login.geometry("400x300")
@@ -335,60 +389,21 @@ def login_gui():
    login.mainloop()
 
 def login_creation_cli():
-    global key, username
-
     os.system(f"cls & title Bacon Manager {version} ~ Account Creation")
     print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long and cant be longer than 64 characters!\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
     second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
 
-    if len(username) < 8:
-      login_creation_cli()
-    if len(master_pass) < 8 or master_pass != second_entry:
-      login_creation_cli()
-    if len(master_pass) > 64 or len(username) > 64:
-       login_creation_cli()
-
-    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
-    key = generate_key(master_pass, salt)
-    encrypted_password = encryption(key, master_pass)
-    hash_password = hashlib.md5(encrypted_password).hexdigest()
-    with open("UserData.txt", "w") as w:
-       w.write(f"{username}04n$b3e0R5K*{hash_password}")
-       w.close()
-
-       main_cli()
+    login_create(master_pass, second_entry, username)
 
 def login_cli():
-    global username, key
-
     os.system(f"title Bacon Manager {version} ~ Account Login & mode con:cols=80 lines=16")
     os.system("cls")
     username = input(colorama.Fore.LIGHTCYAN_EX + "\nUsername ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
 
-    if len(master_pass) < 8 or len(username) < 8:
-      print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
-      time.sleep(2)
-      login_cli()
-
-    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
-    key = generate_key(master_pass, salt)
-    encrypted_password = encryption(key, master_pass)
-    hash_password = hashlib.md5(encrypted_password).hexdigest()
-
-    with open("UserData.txt", "r") as r:
-       userdata = r.read().split("\n")
-       r.close()
-    
-    for user in userdata:
-       if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
-         main_cli()
-
-    print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
-    time.sleep(2)
-    login_cli()
+    login_check(master_pass, username)
 
 def boot():
     global style, version
@@ -407,22 +422,8 @@ def boot():
 
     if os.path.exists("UserData.txt"):
       new_user = False
-      if os.path.exists("Passwords.txt"):
-         pass
-      else:
-         with open("Passwords.txt", "w") as c:
-            c.close()
     else:
       new_user = True
-      with open("UserData.txt", "w") as c:
-        c.close()
-      if os.path.exists("Passwords.txt"):
-         os.remove("Passwords.txt")
-         with open("Passwords.txt", "w") as c:
-            c.close()
-      else:
-        with open("Passwords.txt", "w") as c:
-          c.close()
 
     if new_user == True and style == "cli":
        login_creation_cli()
