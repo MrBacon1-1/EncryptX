@@ -1,3 +1,6 @@
+
+#----------------------------------Modules----------------------------------#
+
 import os
 import colorama
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -13,6 +16,10 @@ import pyperclip
 import random
 import customtkinter
 import base64
+import tkinter as tk
+from tkinter import ttk
+
+#----------------------------------Constants----------------------------------#
 
 MAIN_MENU = f"""                                                        
                                          _____                    _____                         
@@ -54,6 +61,8 @@ MAIN_MENU = f"""
 
 
 """
+
+#----------------------------------Functions----------------------------------#
 
 def generate_key(master_password, salt):
     backend = default_backend()
@@ -188,6 +197,8 @@ def password_rating_check(password):
 
     return score
 
+#----------------------------------Main CLI----------------------------------#
+
 def main_cli():
     os.system("cls")
     os.system(f"title Bacon Manager {version} ~ Logged In As {username_} ")
@@ -263,12 +274,42 @@ def main_cli():
 
     main_cli()
 
+#----------------------------------Main GUI----------------------------------#
+
 def main_gui():
    main = customtkinter.CTk()
    main.geometry("900x700")
    main.title(f"Bacon Manager {version} ~ Logged In As {username_}")
 
+   try: 
+      get_passwords()
+   except:
+      pass
+
+   print(ready_data)
+
+   tree = ttk.Treeview(main, columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
+
+   tree.heading("ID", text="ID")
+   tree.heading("Name/URL", text="Name/URL")
+   tree.heading("Username", text="Username")
+   tree.heading("Password", text="Password")
+   tree.heading("Password_Rating", text="Password Rating (1-5)")
+
+   for line in ready_data:
+    tree.insert("", "end", values=(line))
+
+   tree.column("ID", anchor="center")
+   tree.column("Name/URL", anchor="center")
+   tree.column("Username", anchor="center")
+   tree.column("Password", anchor="center")
+   tree.column("Password_Rating", anchor="center")
+
+   tree.pack(pady=40, padx=5)
+
    main.mainloop()
+
+#----------------------------------Login Functions----------------------------------#
 
 def login_check(master_pass, username):
    global username_, key
@@ -404,6 +445,8 @@ def login_cli():
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
 
     login_check(master_pass, username)
+
+#----------------------------------Boot----------------------------------#
 
 def boot():
     global style, version
