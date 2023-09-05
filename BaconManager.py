@@ -277,9 +277,15 @@ def main_cli():
 #----------------------------------Main GUI----------------------------------#
 
 def main_gui():
-   main = customtkinter.CTk()
-   main.geometry("900x700")
-   main.title(f"Bacon Manager {version} ~ Logged In As {username_}")
+   
+
+   # Home Page
+
+   # Password Page
+
+   password_page = customtkinter.CTk()
+   password_page.geometry("900x700")
+   password_page.title(f"Bacon Manager {version} ~ Logged In As {username_}")
 
    try: 
       get_passwords()
@@ -288,7 +294,7 @@ def main_gui():
 
    print(ready_data)
 
-   tree = ttk.Treeview(main, columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
+   tree = ttk.Treeview(password_page, columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
 
    tree.heading("ID", text="ID")
    tree.heading("Name/URL", text="Name/URL")
@@ -307,7 +313,9 @@ def main_gui():
 
    tree.pack(pady=40, padx=5)
 
-   main.mainloop()
+   password_page.mainloop()
+
+   # Settings Page
 
 #----------------------------------Login Functions----------------------------------#
 
