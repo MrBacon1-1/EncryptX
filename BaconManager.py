@@ -16,8 +16,8 @@ import pyperclip
 import random
 import customtkinter
 import base64
-import tkinter as tk
-from tkinter import ttk
+import tkinter
+import ctypes
 
 #----------------------------------Constants----------------------------------#
 
@@ -276,44 +276,86 @@ def main_cli():
 
 #----------------------------------Main GUI----------------------------------#
 
+def refresh_treeview(tree):
+   for item in tree.get_children():
+      tree.delete(item)
+
+   get_passwords()
+   for line in ready_data:
+      tree.insert("", "end", values=(line)) 
+
+def add_password_gui(root):
+   info_window = customtkinter.CTkToplevel(root)
+   info_window.geometry("400x200")
+   info_window.title("Add Password")
+   name_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Name/URL")
+   username_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Username")
+   password_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Password")
+   name_text_box.pack(padx=10, pady=10)
+   username_text_box.pack(padx=10, pady=10)
+   password_text_box.pack(padx=10, pady=10)
+
+   def send_info():
+       name = name_text_box.get()
+       username = username_text_box.get()
+       password = password_text_box.get()
+
+       add_password(name, username, password)
+
+   save_button = tkinter.Button(info_window, text="Add Password", command=send_info)
+   save_button.pack(pady=5)
+
 def main_gui():
-   
 
-   # Home Page
+   root = customtkinter.CTk()
+   root.geometry("900x700")
+   root.resizable(width=0, height=0)
+   root.title(f"Bacon Manager {version} ~ Logged In As {username_}")
 
-   # Password Page
+   tabview = customtkinter.CTkTabview(root, width=900, height=700)
+   tabview.pack(pady=5,padx=5)
+   tabview.add("Passwords")
+   tabview.add("Stats")
+   tabview.add("Settings") 
 
-   password_page = customtkinter.CTk()
-   password_page.geometry("900x700")
-   password_page.title(f"Bacon Manager {version} ~ Logged In As {username_}")
+   # Password Page   
 
    try: 
       get_passwords()
    except:
-      pass
+      pass  
 
-   print(ready_data)
+   tree = tkinter.ttk.Treeview(master=tabview.tab("Passwords"), columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
 
-   tree = ttk.Treeview(password_page, columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
+   scrollbar = tkinter.ttk.Scrollbar(tree, orient=tkinter.VERTICAL, command=tree.yview)
+   tree.configure(yscroll=scrollbar.set) 
 
    tree.heading("ID", text="ID")
    tree.heading("Name/URL", text="Name/URL")
    tree.heading("Username", text="Username")
    tree.heading("Password", text="Password")
-   tree.heading("Password_Rating", text="Password Rating (1-5)")
+   tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
    for line in ready_data:
-    tree.insert("", "end", values=(line))
+    tree.insert("", "end", values=(line)) 
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
    tree.column("Username", anchor="center")
    tree.column("Password", anchor="center")
-   tree.column("Password_Rating", anchor="center")
+   tree.column("Password_Rating", anchor="center") 
 
-   tree.pack(pady=40, padx=5)
+   tree.pack(fill="both", expand=True) 
 
-   password_page.mainloop()
+   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", command=lambda: add_password_gui(root))
+   add_password_button.pack(pady=(10,5), padx=5)
+
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", command=lambda: refresh_treeview(tree))
+   refresh_button.pack()
+
+   root.mainloop()   
+
+   # Stats Page
 
    # Settings Page
 
@@ -398,8 +440,15 @@ def login_create(master_pass, second_entry, username):
 def login_creation_gui():
    global login
 
+   SW_HIDE = 0
+   SW_SHOW = 5
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+
    login = customtkinter.CTk()
    login.geometry("400x300")
+   login.resizable(width=0, height=0)
    login.title(f"Bacon Manager {version} ~ Account Creation")
 
    title = customtkinter.CTkLabel(master=login, text="Bacon Manager", font=("Cascadia Code", 32))
@@ -420,8 +469,15 @@ def login_creation_gui():
 def login_gui():
    global login
 
+   SW_HIDE = 0
+   SW_SHOW = 5
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+
    login = customtkinter.CTk()
    login.geometry("400x300")
+   login.resizable(width=0, height=0)
    login.title(f"Bacon Manager {version} ~ Account Login")
 
    title = customtkinter.CTkLabel(master=login, text="Bacon Manager", font=("Cascadia Code", 22))
