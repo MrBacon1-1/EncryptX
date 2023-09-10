@@ -18,6 +18,7 @@ import customtkinter
 import base64
 import tkinter
 import ctypes
+import sys
 
 #----------------------------------Constants----------------------------------#
 
@@ -40,7 +41,7 @@ MAIN_MENU = f"""
                                  .~7?7!^^^~!!!^..7GJ?JB.                    |
                                ^J?~^^^~!!!!^:..~5PJ?JB^ 77^                 |           4 ~> Password Generator
                               7Y^:^~!!!~^:.:~?55J?J5G~^5~^YY                |
-                             ~P::~!!~^..:!Y55YJJY557.7Y^^~~JP               |           5 ~> Join My Discord Server
+                             ~P::~!!~^..:!Y55YJJY557.7Y^^~~JP               |           5 ~> Switch To GUI
                             .G^:^!!^..!5PYJJJYYJ7^.~Y!:^!!!!?5              |           
                             P7:^!!:.^PPJ?YPBGJ!~~7?!^^~!!!!^.PY             |           6 ~> Exit
                           ~5!:^~!:.~BY?JG5!~~~~~~^^^~!!!!~:.YP#.            |   
@@ -61,6 +62,9 @@ MAIN_MENU = f"""
 
 
 """
+
+SW_HIDE = 0
+SW_SHOW = 5
 
 #----------------------------------Functions----------------------------------#
 
@@ -261,8 +265,10 @@ def main_cli():
        main_cli()
 
     elif opt == "5":
-       os.system("start https://discord.gg/cf9mxTgDFa")
-       main_cli()
+      hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+      if hwnd:
+          ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+      main_gui()
 
     elif opt == "6":
        exit()
@@ -275,6 +281,15 @@ def main_cli():
     main_cli()
 
 #----------------------------------Main GUI----------------------------------#
+
+def switch_to_cli(root):
+   time.sleep(1)
+   root.destroy()
+   time.sleep(1)
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+       ctypes.windll.user32.ShowWindow(hwnd, SW_SHOW)
+   main_cli()
 
 def refresh_treeview(tree):
    for item in tree.get_children():
@@ -356,17 +371,22 @@ def main_gui():
 
    tree.pack(fill="both", expand=True) 
 
-   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", command=lambda: add_password_gui(root, tree))
+   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", command=lambda: refresh_treeview(tree))
-   refresh_button.pack()
-
-   root.mainloop()   
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview(tree))
+   refresh_button.pack() 
 
    # Stats Page
 
    # Settings Page
+
+   switch_mode_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Switch To CLI", font=("Cascadia Code", 12), command=lambda: switch_to_cli)
+   switch_mode_button.pack(pady=(10,5), padx=5)
+
+
+
+   root.mainloop()  
 
 #----------------------------------Login Functions----------------------------------#
 
@@ -449,8 +469,6 @@ def login_create(master_pass, second_entry, username):
 def login_creation_gui():
    global login
 
-   SW_HIDE = 0
-   SW_SHOW = 5
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
        ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
@@ -478,8 +496,6 @@ def login_creation_gui():
 def login_gui():
    global login
 
-   SW_HIDE = 0
-   SW_SHOW = 5
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
        ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
