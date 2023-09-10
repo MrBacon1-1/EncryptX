@@ -284,7 +284,7 @@ def refresh_treeview(tree):
    for line in ready_data:
       tree.insert("", "end", values=(line)) 
 
-def add_password_gui(root):
+def add_password_gui(root, tree):
    info_window = customtkinter.CTkToplevel(root)
    info_window.geometry("400x200")
    info_window.title("Add Password")
@@ -295,14 +295,23 @@ def add_password_gui(root):
    username_text_box.pack(padx=10, pady=10)
    password_text_box.pack(padx=10, pady=10)
 
-   def send_info():
+   def send_info(tree):
        name = name_text_box.get()
        username = username_text_box.get()
        password = password_text_box.get()
 
        add_password(name, username, password)
 
-   save_button = tkinter.Button(info_window, text="Add Password", command=send_info)
+       for item in tree.get_children():
+         tree.delete(item)
+
+       get_passwords()
+       for line in ready_data:
+         tree.insert("", "end", values=(line)) 
+
+       info_window.destroy()
+
+   save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
    save_button.pack(pady=5)
 
 def main_gui():
@@ -347,7 +356,7 @@ def main_gui():
 
    tree.pack(fill="both", expand=True) 
 
-   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", command=lambda: add_password_gui(root))
+   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
    refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", command=lambda: refresh_treeview(tree))
