@@ -18,7 +18,6 @@ import customtkinter
 import base64
 import tkinter
 import ctypes
-import sys
 
 #----------------------------------Constants----------------------------------#
 
