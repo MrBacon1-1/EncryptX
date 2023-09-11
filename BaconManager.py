@@ -381,7 +381,7 @@ def main_gui():
 
    # Settings Page
 
-   switch_mode_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Switch To CLI", font=("Cascadia Code", 12), command=lambda: switch_to_cli)
+   switch_mode_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Switch To CLI", font=("Cascadia Code", 12), command=lambda: switch_to_cli(root))
    switch_mode_button.pack(pady=(10,5), padx=5)
 
 
