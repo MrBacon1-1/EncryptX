@@ -58,7 +58,7 @@ If you don't have it yet, you can easily download and install it from the offici
 Once Python is ready, you can download the Python file from our GitHub repository.
 To run the password manager, you will need to ensure a few Python packages are installed. Execute the following command in your terminal or command prompt:
 
-`pip install tabulate colorama cryptography pyperclip keyboard customtkinter`
+`pip install tabulate colorama cryptography pyperclip keyboard customtkinter tkinter`
 
 This command will automatically install the necessary dependencies, ensuring the password manager functions smoothly.
 Once everything is set up, open the Python file, and you will have access to the password manager's full range of features. Just like the exe version, you can securely store, view, and remove passwords.
