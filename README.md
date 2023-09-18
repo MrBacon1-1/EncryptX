@@ -5,15 +5,15 @@
    <kbd>
    <img  src="https://raw.githubusercontent.com/MrBacon1-1/Bacon-Manager/main/src/BaconManager.jpg">
    </kbd><br><br>
-   <img src="https://img.shields.io/github/languages/top/MrBacon1-1/Bacon-Manager">
-   <img src="https://img.shields.io/github/stars/MrBacon1-1/Bacon-Manager">
-   <img src="https://img.shields.io/github/forks/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/languages/top/MrBacon1-1/EncryptX">
+   <img src="https://img.shields.io/github/stars/MrBacon1-1/EncryptX">
+   <img src="https://img.shields.io/github/forks/MrBacon1-1/EncryptX">
    <br>
-   <img src="https://img.shields.io/github/last-commit/MrBacon1-1/Bacon-Manager">
-   <img src="https://img.shields.io/github/license/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/last-commit/MrBacon1-1/EncryptX">
+   <img src="https://img.shields.io/github/license/MrBacon1-1/EncryptX">
    <br>
-   <img src="https://img.shields.io/github/issues/MrBacon1-1/Bacon-Manager">
-   <img src="https://img.shields.io/github/issues-closed/MrBacon1-1/Bacon-Manager">
+   <img src="https://img.shields.io/github/issues/MrBacon1-1/EncryptX">
+   <img src="https://img.shields.io/github/issues-closed/MrBacon1-1/EncryptX">
    <br>
    <br>
    <img src="https://repobeats.axiom.co/api/embed/3ad04931195c0e848b2080ec9f682680afa9fb8a.svg">
