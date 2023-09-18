@@ -3,7 +3,7 @@
 </h1>
 <p align= "center">
    <kbd>
-   <img  src="https://raw.githubusercontent.com/MrBacon1-1/Bacon-Manager/main/src/EncryptX.jpg">
+   <img  src="https://raw.githubusercontent.com/MrBacon1-1/Bacon-Manager/main/EncryptX.jpg">
    </kbd><br><br>
    <img src="https://img.shields.io/github/languages/top/MrBacon1-1/EncryptX">
    <img src="https://img.shields.io/github/stars/MrBacon1-1/EncryptX">
