@@ -1,6 +1,3 @@
-<h1 align="center">
-   EncryptX
-</h1>
 <p align= "center">
    <kbd>
    <img  src="https://raw.githubusercontent.com/MrBacon1-1/Bacon-Manager/main/EncryptX.jpg">
