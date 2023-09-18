@@ -204,10 +204,10 @@ def password_rating_check(password):
 
 def main_cli():
     os.system("cls")
-    os.system(f"title Bacon Manager {version} ~ Logged In As {username_} ")
+    os.system(f"title EncryptX {version} ~ Logged In As {username_} ")
     os.system("mode con:cols=144 lines=42")
     print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
-    opt = input(colorama.Fore.LIGHTCYAN_EX + "  BaconManager/Console/.. " + colorama.Fore.RESET)
+    opt = input(colorama.Fore.LIGHTCYAN_EX + "  EncryptX/Console/.. " + colorama.Fore.RESET)
 
     if opt == "":
        print(colorama.Fore.RED + "  !Invlid Option!" + colorama.Fore.RESET)
@@ -333,7 +333,7 @@ def main_gui():
    root = customtkinter.CTk()
    root.geometry("900x700")
    root.resizable(width=0, height=0)
-   root.title(f"Bacon Manager {version} ~ Logged In As {username_}")
+   root.title(f"EncryptX {version} ~ Logged In As {username_}")
 
    tabview = customtkinter.CTkTabview(root, width=900, height=700)
    tabview.pack(pady=5,padx=5)
@@ -475,9 +475,9 @@ def login_creation_gui():
    login = customtkinter.CTk()
    login.geometry("400x300")
    login.resizable(width=0, height=0)
-   login.title(f"Bacon Manager {version} ~ Account Creation")
+   login.title(f"EncryptX {version} ~ Account Creation")
 
-   title = customtkinter.CTkLabel(master=login, text="Bacon Manager", font=("Cascadia Code", 32))
+   title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 32))
    title.pack(pady=20, padx=5)
 
    username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
@@ -502,9 +502,9 @@ def login_gui():
    login = customtkinter.CTk()
    login.geometry("400x300")
    login.resizable(width=0, height=0)
-   login.title(f"Bacon Manager {version} ~ Account Login")
+   login.title(f"EncryptX {version} ~ Account Login")
 
-   title = customtkinter.CTkLabel(master=login, text="Bacon Manager", font=("Cascadia Code", 22))
+   title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 22))
    title.pack(pady=20, padx=5)
 
    username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
@@ -518,7 +518,7 @@ def login_gui():
    login.mainloop()
 
 def login_creation_cli():
-    os.system(f"cls & title Bacon Manager {version} ~ Account Creation")
+    os.system(f"cls & title EncryptX {version} ~ Account Creation")
     print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long and cant be longer than 64 characters!\n" + colorama.Fore.RESET)
     username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
@@ -527,7 +527,7 @@ def login_creation_cli():
     login_create(master_pass, second_entry, username)
 
 def login_cli():
-    os.system(f"title Bacon Manager {version} ~ Account Login & mode con:cols=80 lines=16")
+    os.system(f"title EncryptX {version} ~ Account Login & mode con:cols=80 lines=16")
     os.system("cls")
     username = input(colorama.Fore.LIGHTCYAN_EX + "\nUsername ~> " + colorama.Fore.RESET)
     master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
@@ -542,7 +542,7 @@ def boot():
 
     keyboard.add_hotkey('Ctrl+E', exit_bind)
 
-    os.system(f"title Bacon Manager {version} & mode con:cols=80 lines=16")
+    os.system(f"title EncryptX {version} & mode con:cols=80 lines=16")
     boot = input(colorama.Fore.LIGHTCYAN_EX + "Would you like to use CLI or GUI? " + colorama.Fore.RESET)
     if boot.lower() == "cli":
       style = "cli"
