@@ -1,5 +1,5 @@
 <h1 align="center">
-   Bacon Manager
+   EncryptX
 </h1>
 <p align= "center">
    <kbd>
