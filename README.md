@@ -33,8 +33,8 @@
    Future Plans :D
 </h2>
 
-- [ ] May add a possiblilty to sync with our server (at no cost to you) so you can see your passwords no matter what device you log on with. (All data will either be encrypted or hashed this means we cannot see your passwords.)
-- [ ] May add the possiblity to self host a server where you can store your passwords on your own server therfore no matter what device you log on via you will still be able to view your passwords.
+- [ ] Add the possiblilty to sync with our server so you can see your passwords no matter what device you log on with. (All data will either be encrypted or hashed this means we cannot see your passwords.)
+- [ ] Add the possiblity to self host a server where you can store your passwords on your own server therfore no matter what device you log on via you will still be able to view your passwords.
 
 <h2 align="center">
    Why I used AES encrytion?
