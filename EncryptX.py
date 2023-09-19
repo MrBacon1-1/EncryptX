@@ -21,49 +21,47 @@ import ctypes
 
 #----------------------------------Constants----------------------------------#
 
-MAIN_MENU = f"""                                                        
-                                         _____                    _____                         
-                                        | __  |___ ___ ___ ___   |     |___ ___ ___ ___ ___ ___ 
-                                        | __ -| .'|  _| . |   |  | | | | .'|   | .'| . | -_|  _|
-                                        |_____|__,|___|___|_|_|  |_|_|_|__,|_|_|__,|_  |___|_|   Ver. 1.0
-                                                                                   |___|        
-                                                                                                   
-                                                                            |
-                                                                            |          <Options>
-                                              :.                            |
-                                            :P!7?7:                         |
-                                            P!::^77?!                       |           1 ~> View Passwords
-                                           ~P:::~!:.#G^                     |
-                                          :P^::~!~.^BJB^                    |           2 ~> Add Password
-                                         !5^::~!!:.JG?55                    |
-                                     .^7J!::^~!!:.~BJ?G?                    |           3 ~> Remove Password
-                                 .~7?7!^^^~!!!^..7GJ?JB.                    |
-                               ^J?~^^^~!!!!^:..~5PJ?JB^ 77^                 |           4 ~> Password Generator
-                              7Y^:^~!!!~^:.:~?55J?J5G~^5~^YY                |
-                             ~P::~!!~^..:!Y55YJJY557.7Y^^~~JP               |           5 ~> Switch To GUI
-                            .G^:^!!^..!5PYJJJYYJ7^.~Y!:^!!!!?5              |           
-                            P7:^!!:.^PPJ?YPBGJ!~~7?!^^~!!!!^.PY             |           6 ~> Exit
-                          ~5!:^~!:.~BY?JG5!~~~~~~^^^~!!!!~:.YP#.            |   
-                     .:~7?7^:^~!^..BY?JBY~~!!!!!!!!!!!!!^.:5P5G             |            
-                .^7??7!~^:^^~!!~..5P??GP~!!!!!!!!!!!!~^..7P5PJ              |          <Key Binds>
-             .!?7~^^^^^~~!!!!~:..JGJ?5P::::::::::::...:75P5P^               |           
-           .JJ~::^~~!!!!~~^:..:7P5??5B7!7??777!!!!!7?YPPP5~                 |            
-         :5B~:^~!!!!~^:.:^!7JY5YJ?YGBPY555555555PPPPP5Y7:                   |           Ctrl + E ~> Exit
-        ?JP?:~!!!!^..^?Y555YYYYYP#GYJY5Y7~^^^~~!!~~:.                       |            
-        B^55~!!!~..^5PYJY5YJ?!~7G5?YP7.                                     |             
-        YY!PP7!~..7GY?5BJ~^^^!YPJYP?.                                       |            
-         G7^~J5!.~BJ?5B5YY555YY55?.                                         |
-         .P:.7GP5#GJJBGYYY555Y?^                                            |
-          :PG5?YP?~JY?.:^^:.                                                |
-           .55P5.                                                           |
-             ..                                                             |
-                                                                            |   
-
-
-"""
-
+version = "v1.0"
 SW_HIDE = 0
 SW_SHOW = 5
+
+MAIN_MENU = f"""                                                        
+
+                                                    ______                            __ _  __
+                                                   / ____/___  ____________  ______  / /| |/ /
+                                                  / __/ / __ \/ ___/ ___/ / / / __ \/ __/   / 
+                                                 / /___/ / / / /__/ /  / /_/ / /_/ / /_/   |  
+                                                /_____/_/ /_/\___/_/   \__, / .___/\__/_/|_|  {version}
+                                                                      /____/_/                  
+
+                                                                            |
+                                                                            |          <Options>
+                                ^7YGB#&&&&#BGY7^                            |
+                              ~5#&@&&@@@@@@&&@&#5~                          |
+                             Y&@&&&&BPYJJYPB&&&&@&Y:                        |           1 ~> View Passwords              
+                           :P@&&&&P!        !P&&&&@P:                       |
+                           J@&&&&J            J&&&&@J                       |           2 ~> Add Password
+                           G&&&&B              B&&&&G                       |
+                           B&&&&G              G&&&&B                       |           3 ~> Remove Password
+                           B&&&&G              G&&&&G                       |
+                           B&&&&G              G&&&&G                       |           4 ~> Password Generator
+                           B&&&&G              G&&&&B                       |
+                     JGBBBB&&&&&&BBBBBBBBBBBBBB&&&&&&BBBBGJ                 |           5 ~> Switch To GUI
+                     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&&&&@@&&&&&&&&&&&&&&&&&&                 |           6 ~> Exit
+                     &&&&&&&&&&&&&&&&#PYYP#&&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&G^....^G&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&@J .... J@&&&&&&&&&&&&&&                 |          <Key Binds>
+                     &&&&&&&&&&&&&&&#J:..:J#&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&&B:..:B&&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&@J....J@&&&&&&&&&&&&&&&                 |           Ctrl + E ~> Exit
+                     &&&&&&&&&&&&&&&&~ .. ~&&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&#777777#&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
+                     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
+                     P&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&P                 |
+                                                                            |
+"""
 
 #----------------------------------Functions----------------------------------#
 
@@ -205,12 +203,12 @@ def password_rating_check(password):
 def main_cli():
     os.system("cls")
     os.system(f"title EncryptX {version} ~ Logged In As {username_} ")
-    os.system("mode con:cols=144 lines=42")
+    os.system("mode con:cols=144 lines=41")
     print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
     opt = input(colorama.Fore.LIGHTCYAN_EX + "  EncryptX/Console/.. " + colorama.Fore.RESET)
 
     if opt == "":
-       print(colorama.Fore.RED + "  !Invlid Option!" + colorama.Fore.RESET)
+       print(colorama.Fore.RED + "\n" +"  !Invlid Option!" + colorama.Fore.RESET)
        time.sleep(1)
        main_cli()
 
@@ -273,7 +271,7 @@ def main_cli():
        exit()
        
     else:
-       print(colorama.Fore.RED + "  !Invlid Option!" + colorama.Fore.RESET)
+       print(colorama.Fore.RED + "\n" + "  !Invlid Option!" + colorama.Fore.RESET)
        time.sleep(1)
        main_cli()
 
@@ -537,8 +535,7 @@ def login_cli():
 #----------------------------------Boot----------------------------------#
 
 def boot():
-    global style, version
-    version = "v1.0"
+    global style
 
     keyboard.add_hotkey('Ctrl+E', exit_bind)
 
