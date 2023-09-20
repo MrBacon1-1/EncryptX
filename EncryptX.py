@@ -288,6 +288,12 @@ def switch_to_cli(root):
        ctypes.windll.user32.ShowWindow(hwnd, SW_SHOW)
    main_cli()
 
+def refresh_stats(total_passwords):
+   get_passwords()
+   global total_passwords_value
+   total_passwords_value = len(ready_data)
+   total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
+
 def refresh_treeview(tree):
    for item in tree.get_children():
       tree.delete(item)
@@ -375,6 +381,16 @@ def main_gui():
    refresh_button.pack() 
 
    # Stats Page
+
+   title_stats = customtkinter.CTkLabel(master=tabview.tab("Stats"), text="EncryptX Stats", font=("Cascadia Code", 22))
+   title_stats.pack(pady=15, padx=10)
+
+   total_passwords_value = len(ready_data)
+   total_passwords_label = customtkinter.CTkLabel(master=tabview.tab("Stats"), text=("Passwords Saved ~> ", total_passwords_value), font=("Cascadia Code", 12))
+   total_passwords_label.pack(pady=(10,5), padx=5)
+
+   refresh_button_stats = customtkinter.CTkButton(master=tabview.tab("Stats"), text="Refresh Stats", font=("Cascadia Code", 12), command=lambda: refresh_stats(total_passwords_label))
+   refresh_button_stats.pack() 
 
    # Settings Page
 
