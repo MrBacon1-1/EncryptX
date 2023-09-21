@@ -121,9 +121,13 @@ def get_passwords():
     global ready_data
     ready_data = []
 
+    if os.path.isfile("Passwords.txt") != True:
+      with open("Passwords.txt", "w") as w:
+         w.close()
+      
     with open("Passwords.txt", "rb") as read:
-        split_data = read.read().split(b"\n")
-        read.close()
+      split_data = read.read().split(b"\n")
+      read.close()
 
     for data in split_data:
         if data:
