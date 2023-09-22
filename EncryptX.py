@@ -220,9 +220,9 @@ def main_cli():
        get_passwords()
        table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password", "Rating (1-5)"], tablefmt="double_grid")
     
-       lenght = len(table_to_print.split("\n")[0])
+       Length = len(table_to_print.split("\n")[0])
     
-       os.system(f"cls && mode con:cols={lenght} lines=9999")
+       os.system(f"cls && mode con:cols={Length} lines=9999")
        print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
        input()
        main_cli()
@@ -249,7 +249,7 @@ def main_cli():
     elif opt == "4":
        os.system("cls & mode con:cols=80 lines=16")
        while True:
-         length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Lenght ~> " + colorama.Fore.RESET))
+         length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Length ~> " + colorama.Fore.RESET))
          characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
          generated_password = ""
          for i in range(length):
