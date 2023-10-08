@@ -163,6 +163,16 @@ def remove_password(index):
          if index_of_line != int(index):
             write.write(line)
 
+   if style == "gui":
+      for item in tree.get_children():
+         tree.delete(item)
+
+      get_passwords()
+      for line in ready_data:
+         tree.insert("", "end", values=(line)) 
+      
+      
+
 def password_rating_check(password):
     score = 0
     lowercase_characters_present = uppercase_characters_present = special_characters_present = numbers_present = False
@@ -336,7 +346,19 @@ def add_password_gui(root, tree):
    save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
    save_button.pack(pady=5)
 
+def on_right_click(event):
+   item = tree.identify_row(event.y)
+   if item != "":
+      item_id = tree.item(item, "values")[0]
+
+   if item:
+      menu = tkinter.Menu(root, tearoff=0)
+      menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
+      menu.tk_popup(event.x_root, event.y_root)
+
 def main_gui():
+
+   global tree, root
 
    root = customtkinter.CTk()
    root.geometry("900x700")
@@ -377,6 +399,8 @@ def main_gui():
    tree.column("Password_Rating", anchor="center") 
 
    tree.pack(fill="both", expand=True) 
+
+   tree.bind("<Button-3>", on_right_click)
 
    add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
