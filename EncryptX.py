@@ -66,71 +66,71 @@ MAIN_MENU = f"""
 #----------------------------------Functions----------------------------------#
 
 def generate_key(master_password, salt):
-    backend = default_backend()
-    iterations = 100000
+   backend = default_backend()
+   iterations = 100000
 
-    master_password_bytes = master_password.encode()
-    salt_bytes = salt.encode()
+   master_password_bytes = master_password.encode()
+   salt_bytes = salt.encode()
 
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=16,
-        salt=salt_bytes,
-        iterations=iterations,
-        backend=backend
-    )
+   kdf = PBKDF2HMAC(
+      algorithm=hashes.SHA256(),
+      length=16,
+      salt=salt_bytes,
+      iterations=iterations,
+      backend=backend
+   )
 
-    key = kdf.derive(master_password_bytes)
+   key = kdf.derive(master_password_bytes)
 
-    return key.hex()
+   return key.hex()
 
 
 def encryption(key, plaintext):
-    backend = default_backend()
-    block_size = algorithms.AES.block_size
+   backend = default_backend()
+   block_size = algorithms.AES.block_size
 
-    padder = padding.PKCS7(block_size).padder()
-    padded_plaintext = padder.update(plaintext.encode()) + padder.finalize()
+   padder = padding.PKCS7(block_size).padder()
+   padded_plaintext = padder.update(plaintext.encode()) + padder.finalize()
 
-    cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
-    encryptor = cipher.encryptor()
+   cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
+   encryptor = cipher.encryptor()
 
-    ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
+   ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
 
-    return ciphertext
+   return ciphertext
 
 def decryption(key, ciphertext):
-    backend = default_backend()
-    block_size = algorithms.AES.block_size
+   backend = default_backend()
+   block_size = algorithms.AES.block_size
 
-    cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
-    decryptor = cipher.decryptor()
+   cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
+   decryptor = cipher.decryptor()
 
-    padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+   padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
 
-    unpadder = padding.PKCS7(block_size).unpadder()
-    plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
+   unpadder = padding.PKCS7(block_size).unpadder()
+   plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
 
-    return plaintext
+   return plaintext
 
 def exit_bind():
    pid = os.getpid()
    os.system(f"taskkill /F /PID {pid}")
 
-def get_passwords():
-    global ready_data
-    ready_data = []
+def get_data():
+   global ready_data
+   ready_data = []
 
-    if os.path.isfile("Passwords.txt") != True:
+   if os.path.isfile("Passwords.txt") != True:
       with open("Passwords.txt", "w") as w:
          w.close()
       
-    with open("Passwords.txt", "rb") as read:
+   with open("Passwords.txt", "rb") as read:
       split_data = read.read().split(b"\n")
       read.close()
 
-    for data in split_data:
-        if data:
+   for data in split_data:
+         if data:
             url_or_program, user, password = data.split(b"04n$b3e0R5K*")
             url_or_program, user, password = base64.b64decode(url_or_program), base64.b64decode(user), base64.b64decode(password)
             url_or_program = decryption(key, url_or_program).decode()
@@ -139,20 +139,20 @@ def get_passwords():
             rating = password_rating_check(password)
             ready_data.append([url_or_program, user, password, rating])
             
-    for ind, x in enumerate(ready_data):
-        x.insert(0, ind) 
+   for ind, x in enumerate(ready_data):
+      x.insert(0, ind) 
 
 
 def add_password(url_or_program, user, password):
-    encrypted_password = encryption(key, password)
-    time.sleep(0.2)
-    encrypted_username = encryption(key, user)
-    time.sleep(0.2)
-    encrypted_url_or_program = encryption(key, url_or_program)
-    time.sleep(0.2)
+   encrypted_password = encryption(key, password)
+   time.sleep(0.2)
+   encrypted_username = encryption(key, user)
+   time.sleep(0.2)
+   encrypted_url_or_program = encryption(key, url_or_program)
+   time.sleep(0.2)
 
-    with open("Passwords.txt", "ab") as p:
-        p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
+   with open("Passwords.txt", "ab") as p:
+      p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
        
 def remove_password(index):
    with open("Passwords.txt", "rb") as read:
@@ -167,7 +167,7 @@ def remove_password(index):
       for item in tree.get_children():
          tree.delete(item)
 
-      get_passwords()
+      get_data()
       for line in ready_data:
          tree.insert("", "end", values=(line)) 
       
@@ -184,28 +184,28 @@ def password_rating_check(password):
  
     for char in lowercase_characters:
         if char in password:
-          lowercase_characters_present = True
+         lowercase_characters_present = True
     for char in uppercase_characters:
         if char in password:
-          uppercase_characters_present = True
+         uppercase_characters_present = True
     for char in special_characters:
         if char in password:
-          special_characters_present = True
+         special_characters_present = True
     for char in numbers:
         if char in password:
-          numbers_present = True
+         numbers_present = True
  
     if lowercase_characters_present == True:
-       score +=1
+      score +=1
 
     if uppercase_characters_present == True:
-       score +=1
+      score +=1
 
     if special_characters_present == True:
-       score +=1
+      score +=1
 
     if numbers_present == True:
-       score +=1
+      score +=1
 
     if len(password) >= 8:
       score +=1
@@ -215,50 +215,52 @@ def password_rating_check(password):
 #----------------------------------Main CLI----------------------------------#
 
 def main_cli():
-    os.system("cls")
-    os.system(f"title EncryptX {version} ~ Logged In As {username_} ")
-    os.system("mode con:cols=144 lines=41")
-    print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
-    opt = input(colorama.Fore.LIGHTCYAN_EX + "  EncryptX/Console/.. " + colorama.Fore.RESET)
+   style = "cli"
 
-    if opt == "":
-       print(colorama.Fore.RED + "\n" +"  !Invlid Option!" + colorama.Fore.RESET)
-       time.sleep(1)
-       main_cli()
+   os.system("cls")
+   os.system(f"title EncryptX {version} ~ Logged In As {username_} ")
+   os.system("mode con:cols=144 lines=41")
+   print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
+   opt = input(colorama.Fore.LIGHTCYAN_EX + "  EncryptX/Console/.. " + colorama.Fore.RESET)
 
-    elif opt == "1":
-       get_passwords()
-       table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password", "Rating (1-5)"], tablefmt="double_grid")
+   if opt == "":
+      print(colorama.Fore.RED + "\n" +"  !Invlid Option!" + colorama.Fore.RESET)
+      time.sleep(1)
+      main_cli()
+
+   elif opt == "1":
+      get_data()
+      table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password", "Rating (1-5)"], tablefmt="double_grid")
     
-       Length = len(table_to_print.split("\n")[0])
+      Length = len(table_to_print.split("\n")[0])
     
-       os.system(f"cls && mode con:cols={Length} lines=9999")
-       print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
-       input()
-       main_cli()
+      os.system(f"cls && mode con:cols={Length} lines=9999")
+      print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
+      input()
+      main_cli()
 
-    elif opt == "2":
-       os.system("cls & mode con:cols=80 lines=16")
-       print(colorama.Fore.RED + "\nYour name, username or password can not be longer than 50 characters.\n" + colorama.Fore.RESET)
-       url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
-       user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
-       password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
+   elif opt == "2":
+      os.system("cls & mode con:cols=80 lines=16")
+      print(colorama.Fore.RED + "\nYour name, username or password can not be longer than 50 characters.\n" + colorama.Fore.RESET)
+      url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
+      user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
+      password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
 
-       if len(password) > 50 or len(user) > 50 or len(url_or_program) > 50:
-          main_cli()
+      if len(password) > 50 or len(user) > 50 or len(url_or_program) > 50:
+         main_cli()
 
-       add_password(url_or_program, user, password)
-       main_cli()
+      add_password(url_or_program, user, password)
+      main_cli()
 
-    elif opt == "3":
-       os.system("cls & mode con:cols=80 lines=16")
-       index = input(colorama.Fore.LIGHTCYAN_EX + "\nIndex Of Password To Remove ~> " + colorama.Fore.RESET)
-       remove_password(index)
-       main_cli()
+   elif opt == "3":
+      os.system("cls & mode con:cols=80 lines=16")
+      index = input(colorama.Fore.LIGHTCYAN_EX + "\nIndex Of Password To Remove ~> " + colorama.Fore.RESET)
+      remove_password(index)
+      main_cli()
 
-    elif opt == "4":
-       os.system("cls & mode con:cols=80 lines=16")
-       while True:
+   elif opt == "4":
+      os.system("cls & mode con:cols=80 lines=16")
+      while True:
          length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Length ~> " + colorama.Fore.RESET))
          characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
          generated_password = ""
@@ -273,37 +275,37 @@ def main_cli():
             break
          else:
             continue
-       main_cli()
-
-    elif opt == "5":
+      main_cli()
+      
+   elif opt == "5":
       hwnd = ctypes.windll.kernel32.GetConsoleWindow()
       if hwnd:
-          ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+         ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
       main_gui()
 
-    elif opt == "6":
-       exit()
+   elif opt == "6":
+      exit()
        
-    else:
-       print(colorama.Fore.RED + "\n" + "  !Invlid Option!" + colorama.Fore.RESET)
-       time.sleep(1)
-       main_cli()
+   else:
+      print(colorama.Fore.RED + "\n" + "  !Invlid Option!" + colorama.Fore.RESET)
+      time.sleep(1)
+      main_cli()
 
-    main_cli()
+   main_cli()
 
 #----------------------------------Main GUI----------------------------------#
 
 def switch_to_cli(root):
-   time.sleep(1)
+   time.sleep(0.5)
    root.destroy()
    time.sleep(1)
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
-       ctypes.windll.user32.ShowWindow(hwnd, SW_SHOW)
+      ctypes.windll.user32.ShowWindow(hwnd, SW_SHOW)
    main_cli()
 
 def refresh_stats(total_passwords):
-   get_passwords()
+   get_data()
    global total_passwords_value
    total_passwords_value = len(ready_data)
    total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
@@ -312,7 +314,7 @@ def refresh_treeview(tree):
    for item in tree.get_children():
       tree.delete(item)
 
-   get_passwords()
+   get_data()
    for line in ready_data:
       tree.insert("", "end", values=(line)) 
 
@@ -328,23 +330,36 @@ def add_password_gui(root, tree):
    password_text_box.pack(padx=10, pady=10)
 
    def send_info(tree):
-       name = name_text_box.get()
-       username = username_text_box.get()
-       password = password_text_box.get()
+      name = name_text_box.get()
+      username = username_text_box.get()
+      password = password_text_box.get()
 
-       add_password(name, username, password)
+      add_password(name, username, password)
 
-       for item in tree.get_children():
+      for item in tree.get_children():
          tree.delete(item)
 
-       get_passwords()
-       for line in ready_data:
+      get_data()
+      for line in ready_data:
          tree.insert("", "end", values=(line)) 
 
-       info_window.destroy()
+      info_window.destroy()
 
    save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
    save_button.pack(pady=5)
+
+def copy_user_or_pass(itemid, copy):
+   get_data()
+   data = ready_data[int(itemid)]
+
+   if copy == "user":
+      user = data[2]
+      pyperclip.copy(user)
+   elif copy == "pass":
+      password = data[3]
+      pyperclip.copy(password)
+   else:
+      pass
 
 def on_right_click(event):
    item = tree.identify_row(event.y)
@@ -354,6 +369,8 @@ def on_right_click(event):
    if item:
       menu = tkinter.Menu(root, tearoff=0)
       menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
+      menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
+      menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.tk_popup(event.x_root, event.y_root)
 
 def main_gui():
@@ -361,20 +378,20 @@ def main_gui():
    global tree, root
 
    root = customtkinter.CTk()
-   root.geometry("900x700")
-   root.resizable(width=0, height=0)
+   root.geometry("1400x800")
    root.title(f"EncryptX {version} ~ Logged In As {username_}")
 
-   tabview = customtkinter.CTkTabview(root, width=900, height=700)
+   tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
    tabview.add("Passwords")
+   tabview.add("Password Generator") 
    tabview.add("Stats")
    tabview.add("Settings") 
 
    # Password Page   
 
    try: 
-      get_passwords()
+      get_data()
    except:
       pass  
 
@@ -390,7 +407,7 @@ def main_gui():
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
    for line in ready_data:
-    tree.insert("", "end", values=(line)) 
+      tree.insert("", "end", values=(line)) 
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
@@ -436,13 +453,8 @@ def login_check(master_pass, username):
    username_ = username
    
    if len(master_pass) < 8 or len(username) < 8:
-      if style == "cli":
-         print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
-         time.sleep(2)
-         login_cli()
-      else:
-         login.destroy()
-         exit
+      login.destroy()
+      exit
 
    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
    key = generate_key(master_pass, salt)
@@ -455,16 +467,9 @@ def login_check(master_pass, username):
    
    for user in userdata:
       if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
-         if style == "cli":
-            main_cli()
-         else:
-            login.destroy()
-            main_gui()
+         login.destroy()
+         main_gui()
       else:
-         if style == "cli":
-            print(colorama.Fore.RED + "\n   !Invalid Login!" + colorama.Fore.RESET)
-            time.sleep(2)
-            login_cli()
          login.destroy()
          exit()
              
@@ -473,23 +478,14 @@ def login_create(master_pass, second_entry, username):
    username_ = username
 
    if len(username) < 8:
-     if style == "cli":
-        login_creation_cli()
-     else:
-        login.destroy()
-        exit()
+      login.destroy()
+      exit()
    if len(master_pass) < 8 or master_pass != second_entry:
-     if style == "cli":
-        login_creation_cli()
-     else:
-        login.destroy()
-        exit()
+      login.destroy()
+      exit()
    if len(master_pass) > 64 or len(username) > 64:
-     if style == "cli":
-        login_creation_cli()
-     else:
-        login.destroy()
-        exit()
+      login.destroy()
+      exit()
 
 
    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
@@ -501,18 +497,15 @@ def login_create(master_pass, second_entry, username):
       w.write(f"{username}04n$b3e0R5K*{hash_password}")
       w.close()
 
-   if style == "cli":
-      main_cli()
-   else:
-      login.destroy()
-      main_gui()
+   login.destroy()
+   main_gui()
 
 def login_creation_gui():
    global login
 
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
-       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("400x300")
@@ -523,7 +516,7 @@ def login_creation_gui():
    title.pack(pady=20, padx=5)
 
    username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
-   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12))
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12), show="*")
    second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 12))
    username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
@@ -539,7 +532,7 @@ def login_gui():
 
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
-       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("400x300")
@@ -550,7 +543,7 @@ def login_gui():
    title.pack(pady=20, padx=5)
 
    username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
-   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12))
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12), show="*")
    username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
 
@@ -559,54 +552,23 @@ def login_gui():
 
    login.mainloop()
 
-def login_creation_cli():
-    os.system(f"cls & title EncryptX {version} ~ Account Creation")
-    print(colorama.Fore.RED + "\nYour username & password must be minimum 8 characters long and cant be longer than 64 characters!\n" + colorama.Fore.RESET)
-    username = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
-    master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
-    second_entry = input(colorama.Fore.LIGHTCYAN_EX + "Re-Enter The Password ~> " + colorama.Fore.RESET) 
-
-    login_create(master_pass, second_entry, username)
-
-def login_cli():
-    os.system(f"title EncryptX {version} ~ Account Login & mode con:cols=80 lines=16")
-    os.system("cls")
-    username = input(colorama.Fore.LIGHTCYAN_EX + "\nUsername ~> " + colorama.Fore.RESET)
-    master_pass = input(colorama.Fore.LIGHTCYAN_EX + "Enter Your Master Password ~> " + colorama.Fore.RESET)
-
-    login_check(master_pass, username)
-
 #----------------------------------Boot----------------------------------#
 
 def boot():
-    global style
+   global style
+   style = "gui"
 
-    keyboard.add_hotkey('Ctrl+E', exit_bind)
+   keyboard.add_hotkey('Ctrl+E', exit_bind)
 
-    os.system(f"title EncryptX {version} & mode con:cols=80 lines=16")
-    boot = input(colorama.Fore.LIGHTCYAN_EX + "Would you like to use CLI or GUI? " + colorama.Fore.RESET)
-    if boot.lower() == "cli":
-      style = "cli"
-    elif boot.lower() == "gui":
-      style = "gui"
-    else:
-      exit()
-
-    if os.path.exists("UserData.txt"):
+   if os.path.exists("UserData.txt"):
       new_user = False
-    else:
+   else:
       new_user = True
 
-    if new_user == True and style == "cli":
-       login_creation_cli()
-    elif new_user == True and style == "gui":
-       login_creation_gui()
-    elif new_user == False and style == "cli":
-       login_cli()
-    elif new_user == False and style == "gui":
-       login_gui()
-    else:
-       exit()
+   if new_user == True:
+      login_creation_gui()
+   elif new_user == False:
+      login_gui()
 
 if __name__=="__main__":
-    boot()
+   boot()
