@@ -324,7 +324,7 @@ def add_password_gui(root, tree):
    info_window.title("Add Password")
    name_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Name/URL")
    username_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Username")
-   password_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Password")
+   password_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Password", show="*")
    name_text_box.pack(padx=10, pady=10)
    username_text_box.pack(padx=10, pady=10)
    password_text_box.pack(padx=10, pady=10)
@@ -341,7 +341,7 @@ def add_password_gui(root, tree):
 
       get_data()
       for line in ready_data:
-         tree.insert("", "end", values=(line)) 
+         tree.insert("", "end", values=(line))
 
       info_window.destroy()
 
@@ -517,7 +517,7 @@ def login_creation_gui():
 
    username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12), show="*")
-   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 12))
+   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 12), show="*")
    username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
    second_password_box.pack(pady=5, padx=5)
