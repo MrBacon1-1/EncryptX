@@ -84,7 +84,6 @@ def generate_key(master_password, salt):
 
    return key.hex()
 
-
 def encryption(key, plaintext):
    backend = default_backend()
    block_size = algorithms.AES.block_size
@@ -142,7 +141,6 @@ def get_data():
    for ind, x in enumerate(ready_data):
       x.insert(0, ind) 
 
-
 def add_password(url_or_program, user, password):
    encrypted_password = encryption(key, password)
    time.sleep(0.2)
@@ -163,16 +161,16 @@ def remove_password(index):
          if index_of_line != int(index):
             write.write(line)
 
-   if style == "gui":
+   try:
       for item in tree.get_children():
          tree.delete(item)
 
       get_data()
       for line in ready_data:
          tree.insert("", "end", values=(line)) 
+   except:
+      pass
       
-      
-
 def password_rating_check(password):
     score = 0
     lowercase_characters_present = uppercase_characters_present = special_characters_present = numbers_present = False
@@ -211,6 +209,14 @@ def password_rating_check(password):
       score +=1
 
     return score
+
+def password_generator(length):
+   characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
+   generated_password = ""
+   for i in range(length):
+      generated_password += random.choice(characters)
+
+   return generated_password
 
 #----------------------------------Main CLI----------------------------------#
 
@@ -262,10 +268,7 @@ def main_cli():
       os.system("cls & mode con:cols=80 lines=16")
       while True:
          length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Length ~> " + colorama.Fore.RESET))
-         characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
-         generated_password = ""
-         for i in range(length):
-            generated_password += random.choice(characters)
+         generated_password = password_generator(length)
          print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
          opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
          if opt.lower() == "y":
@@ -424,6 +427,8 @@ def main_gui():
 
    refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview(tree))
    refresh_button.pack() 
+
+   # Password Generator
 
    # Stats Page
 
