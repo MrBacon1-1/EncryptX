@@ -532,14 +532,14 @@ def login_creation_gui():
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 32))
    title.pack(pady=20, padx=5)
 
-   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
-   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12), show="*")
-   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 12), show="*")
+   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 14))
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*")
+   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*")
    username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
    second_password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Create Account", command=lambda:login_create(password_box.get(), second_password_box.get(), username_box.get()))
+   button = customtkinter.CTkButton(master=login, text="Create Account", font=("Cascadia Code", 14), command=lambda:login_create(password_box.get(), second_password_box.get(), username_box.get()))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
@@ -559,12 +559,12 @@ def login_gui():
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 22))
    title.pack(pady=20, padx=5)
 
-   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 12))
-   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 12), show="*")
+   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 14))
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*")
    username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Login", command=lambda:login_check(password_box.get(), username_box.get()))
+   button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda:login_check(password_box.get(), username_box.get()))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
