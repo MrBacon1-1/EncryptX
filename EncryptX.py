@@ -376,6 +376,15 @@ def on_right_click(event):
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.tk_popup(event.x_root, event.y_root)
 
+def combobox_callback(choice):
+   if choice == "Dark Mode":
+      customtkinter.set_appearance_mode("dark")
+   elif choice == "Light Mode":
+      customtkinter.set_appearance_mode("light")
+   else:
+      pass
+
+
 def main_gui():
 
    global tree, root
@@ -444,10 +453,13 @@ def main_gui():
 
    # Settings Page
 
-   switch_mode_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Switch To CLI", font=("Cascadia Code", 12), command=lambda: switch_to_cli(root))
+   switch_mode_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Switch To CLI", font=("Cascadia Code", 18), command=lambda: switch_to_cli(root))
    switch_mode_button.pack(pady=(10,5), padx=5)
 
-
+   combobox_var = customtkinter.StringVar(value="Dark Mode")
+   combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 18) ,command=combobox_callback, variable=combobox_var)
+   combobox_var.set("Dark Mode")
+   combobox.pack(pady=(10,5), padx=5)
 
    root.mainloop()  
 
@@ -564,6 +576,8 @@ def boot():
    style = "gui"
 
    keyboard.add_hotkey('Ctrl+E', exit_bind)
+
+   customtkinter.set_appearance_mode("dark")
 
    if os.path.exists("UserData.txt"):
       new_user = False
