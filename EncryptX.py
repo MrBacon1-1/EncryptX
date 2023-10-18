@@ -212,8 +212,11 @@ def password_rating_check(password):
 
     return score
 
-def password_generator(length):
-   characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
+def password_generator(length, special):
+   if special == "yes":
+      characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
+   else:
+      characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
    generated_password = ""
    for i in range(length):
       generated_password += random.choice(characters)
@@ -270,7 +273,10 @@ def main_cli():
       os.system("cls & mode con:cols=80 lines=16")
       while True:
          length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Length ~> " + colorama.Fore.RESET))
-         generated_password = password_generator(length)
+         special = input(colorama.Fore.LIGHTCYAN_EX + "Use Special Characaters? (Yes/No) ~> " + colorama.Fore.RESET)
+         if special.lower() != "yes" or special.lower() != "no":
+            main_cli()
+         generated_password = password_generator(length, special)
          print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
          opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
          if opt.lower() == "y":
@@ -389,8 +395,16 @@ def combobox_callback(choice):
 def slider_event(value):
    global length, password_generated
    length = slider.get()
-   password_generated = password_generator(int(length))
+   special = use_special.get()
+   password_generated = password_generator(int(length), special)
    length_set.configure(text=f"Password Length: {int(length)}")
+   password_generated_label.configure(text=f"Password: {password_generated}")
+   
+def checkbox_event():
+   global length, password_generated
+   length = slider.get()
+   special = use_special.get()
+   password_generated = password_generator(int(length), special)
    password_generated_label.configure(text=f"Password: {password_generated}")
 
 def main_gui():
@@ -462,6 +476,10 @@ def main_gui():
    slider.pack(pady=(10,5), padx=5)
    slider.configure(number_of_steps=49)
    slider.set(1)
+
+   global use_special
+   use_special = customtkinter.CTkCheckBox(master=tabview.tab("Password Generator"), text="Special Characters", onvalue="yes", offvalue="no", command=checkbox_event)
+   use_special.pack(pady=(10,5), padx=5)
 
    copy_password_button = customtkinter.CTkButton(master=tabview.tab("Password Generator"), text="Copy Password", font=("Cascadia Code", 18), command=lambda: copy_to_clip(password_generated))
    copy_password_button.pack(pady=(10,5), padx=5)
@@ -547,9 +565,9 @@ def login_create(master_pass, second_entry, username):
 def login_creation_gui():
    global login
 
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   # if hwnd:
+   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("400x300")
@@ -574,9 +592,9 @@ def login_creation_gui():
 def login_gui():
    global login
 
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   # if hwnd:
+   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("400x300")
