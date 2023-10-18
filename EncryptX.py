@@ -1,4 +1,3 @@
-
 #----------------------------------Modules----------------------------------#
 
 import os
@@ -54,7 +53,7 @@ MAIN_MENU = f"""
                      &&&&&&&&&&&&&&@J .... J@&&&&&&&&&&&&&&                 |          <Key Binds>
                      &&&&&&&&&&&&&&&#J:..:J#&&&&&&&&&&&&&&&                 |
                      &&&&&&&&&&&&&&&&B:..:B&&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&@J....J@&&&&&&&&&&&&&&&                 |           Ctrl + E ~> Exit
+                     &&&&&&&&&&&&&&&@J....J@&&&&&&&&&&&&&&&                 |           Ctrl + Alt + E ~> Exit
                      &&&&&&&&&&&&&&&&~ .. ~&&&&&&&&&&&&&&&&                 |
                      &&&&&&&&&&&&&&&#777777#&&&&&&&&&&&&&&&                 |
                      &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
@@ -115,6 +114,9 @@ def decryption(key, ciphertext):
 def exit_bind():
    pid = os.getpid()
    os.system(f"taskkill /F /PID {pid}")
+
+def copy_to_clip(string):
+   pyperclip.copy(string)
 
 def get_data():
    global ready_data
@@ -272,7 +274,7 @@ def main_cli():
          print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
          opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
          if opt.lower() == "y":
-            pyperclip.copy(generated_password)
+            copy_to_clip(generated_password)
             print(colorama.Fore.LIGHTCYAN_EX + "Password Copied To Your Clip Board!" + colorama.Fore.RESET)
             time.sleep(2)
             break
@@ -384,6 +386,12 @@ def combobox_callback(choice):
    else:
       pass
 
+def slider_event(value):
+   global length, password_generated
+   length = slider.get()
+   password_generated = password_generator(int(length))
+   length_set.configure(text=f"Password Length: {int(length)}")
+   password_generated_label.configure(text=f"Password: {password_generated}")
 
 def main_gui():
 
@@ -438,6 +446,25 @@ def main_gui():
    refresh_button.pack() 
 
    # Password Generator
+
+   length = 1
+
+   global password_generated_label
+   password_generated_label = customtkinter.CTkLabel(master=tabview.tab("Password Generator"), text=f"Password: Select A Length", font=("Cascadia Code", 18))
+   password_generated_label.pack(pady=(20,5), padx=5)
+
+   global length_set
+   length_set = customtkinter.CTkLabel(master=tabview.tab("Password Generator"), text=f"Password Length: {int(length)}", font=("Cascadia Code", 18))
+   length_set.pack(pady=(20,5), padx=5)
+
+   global slider
+   slider = customtkinter.CTkSlider(master=tabview.tab("Password Generator"), from_=1, to=50, command=slider_event)
+   slider.pack(pady=(10,5), padx=5)
+   slider.configure(number_of_steps=49)
+   slider.set(1)
+
+   copy_password_button = customtkinter.CTkButton(master=tabview.tab("Password Generator"), text="Copy Password", font=("Cascadia Code", 18), command=lambda: copy_to_clip(password_generated))
+   copy_password_button.pack(pady=(10,5), padx=5)
 
    # Stats Page
 
@@ -575,7 +602,7 @@ def boot():
    global style
    style = "gui"
 
-   keyboard.add_hotkey('Ctrl+E', exit_bind)
+   keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
    customtkinter.set_appearance_mode("dark")
 
