@@ -13,7 +13,7 @@
    <img src="https://img.shields.io/github/issues-closed/MrBacon1-1/EncryptX">
    <br>
    <br>
-   <img src="https://repobeats.axiom.co/api/embed/3ad04931195c0e848b2080ec9f682680afa9fb8a.svg">
+   <img src="https://repobeats.axiom.co/api/embed/e84c6509464cf57199f1616024f64c57af11d1dd.svg">
 </p>
 
 <p align="center">
