@@ -112,11 +112,7 @@ def decryption(key, ciphertext):
    return plaintext
 
 def exit_bind():
-   pid = os.getpid()
-   os.system(f"taskkill /F /PID {pid}")
-
-def copy_to_clip(string):
-   pyperclip.copy(string)
+   os.system(f"taskkill /F /PID {os.getpid()}")
 
 def get_data():
    global ready_data
@@ -280,7 +276,7 @@ def main_cli():
          print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
          opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
          if opt.lower() == "y":
-            copy_to_clip(generated_password)
+            pyperclip.copy(generated_password)
             print(colorama.Fore.LIGHTCYAN_EX + "Password Copied To Your Clip Board!" + colorama.Fore.RESET)
             time.sleep(2)
             break
@@ -481,7 +477,7 @@ def main_gui():
    use_special = customtkinter.CTkCheckBox(master=tabview.tab("Password Generator"), text="Special Characters", onvalue="yes", offvalue="no", command=checkbox_event)
    use_special.pack(pady=(10,5), padx=5)
 
-   copy_password_button = customtkinter.CTkButton(master=tabview.tab("Password Generator"), text="Copy Password", font=("Cascadia Code", 18), command=lambda: copy_to_clip(password_generated))
+   copy_password_button = customtkinter.CTkButton(master=tabview.tab("Password Generator"), text="Copy Password", font=("Cascadia Code", 18), command=lambda: pyperclip.copy(password_generated))
    copy_password_button.pack(pady=(10,5), padx=5)
 
    # Stats Page
@@ -516,7 +512,7 @@ def login_check(master_pass, username):
    
    if len(master_pass) < 8 or len(username) < 8:
       login.destroy()
-      exit
+      exit()
 
    salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
    key = generate_key(master_pass, salt)
@@ -565,9 +561,9 @@ def login_create(master_pass, second_entry, username):
 def login_creation_gui():
    global login
 
-   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   # if hwnd:
-   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("400x300")
@@ -592,9 +588,9 @@ def login_creation_gui():
 def login_gui():
    global login
 
-   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   # if hwnd:
-   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("400x300")
