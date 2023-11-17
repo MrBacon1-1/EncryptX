@@ -270,8 +270,10 @@ def main_cli():
       while True:
          length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Length ~> " + colorama.Fore.RESET))
          special = input(colorama.Fore.LIGHTCYAN_EX + "Use Special Characaters? (Yes/No) ~> " + colorama.Fore.RESET)
-         if special.lower() != "yes" or special.lower() != "no":
-            main_cli()
+         if special.lower() != "yes":
+            special = True
+         if special.lower() != "no":
+            special = False
          generated_password = password_generator(length, special)
          print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
          opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
