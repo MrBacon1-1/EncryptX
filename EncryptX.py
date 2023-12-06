@@ -1,21 +1,17 @@
 #----------------------------------Modules----------------------------------#
 
 import os
-import colorama
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives import padding, hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
 import hashlib
-import time
 import keyboard
-from tabulate import tabulate
 import pyperclip
 import random
-import customtkinter
 import base64
 import tkinter
+import customtkinter
 import ctypes
 
 #----------------------------------Constants----------------------------------#
@@ -24,45 +20,9 @@ version = "v1.0"
 SW_HIDE = 0
 SW_SHOW = 5
 
-MAIN_MENU = f"""                                                        
-
-                                                    ______                            __ _  __
-                                                   / ____/___  ____________  ______  / /| |/ /
-                                                  / __/ / __ \/ ___/ ___/ / / / __ \/ __/   / 
-                                                 / /___/ / / / /__/ /  / /_/ / /_/ / /_/   |  
-                                                /_____/_/ /_/\___/_/   \__, / .___/\__/_/|_|  {version}
-                                                                      /____/_/                  
-
-                                                                            |
-                                                                            |          <Options>
-                                ^7YGB#&&&&#BGY7^                            |
-                              ~5#&@&&@@@@@@&&@&#5~                          |
-                             Y&@&&&&BPYJJYPB&&&&@&Y:                        |           1 ~> View Passwords              
-                           :P@&&&&P!        !P&&&&@P:                       |
-                           J@&&&&J            J&&&&@J                       |           2 ~> Add Password
-                           G&&&&B              B&&&&G                       |
-                           B&&&&G              G&&&&B                       |           3 ~> Remove Password
-                           B&&&&G              G&&&&G                       |
-                           B&&&&G              G&&&&G                       |           4 ~> Password Generator
-                           B&&&&G              G&&&&B                       |
-                     JGBBBB&&&&&&BBBBBBBBBBBBBB&&&&&&BBBBGJ                 |           5 ~> Switch To GUI
-                     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&&&&@@&&&&&&&&&&&&&&&&&&                 |           6 ~> Exit
-                     &&&&&&&&&&&&&&&&#PYYP#&&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&G^....^G&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&@J .... J@&&&&&&&&&&&&&&                 |          <Key Binds>
-                     &&&&&&&&&&&&&&&#J:..:J#&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&&B:..:B&&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&@J....J@&&&&&&&&&&&&&&&                 |           Ctrl + Alt + E ~> Exit
-                     &&&&&&&&&&&&&&&&~ .. ~&&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&#777777#&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
-                     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&                 |
-                     P&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&P                 |
-                                                                            |
-"""
-
 #----------------------------------Functions----------------------------------#
+
+# Encryption Related #
 
 def generate_key(master_password, salt):
    backend = default_backend()
@@ -111,8 +71,12 @@ def decryption(key, ciphertext):
 
    return plaintext
 
+# Keybinds #
+
 def exit_bind():
    os.system(f"taskkill /F /PID {os.getpid()}")
+
+# Password Related #
 
 def get_data():
    global ready_data
@@ -141,11 +105,8 @@ def get_data():
 
 def add_password(url_or_program, user, password):
    encrypted_password = encryption(key, password)
-   time.sleep(0.2)
    encrypted_username = encryption(key, user)
-   time.sleep(0.2)
    encrypted_url_or_program = encryption(key, url_or_program)
-   time.sleep(0.2)
 
    with open("Passwords.txt", "ab") as p:
       p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
@@ -159,15 +120,12 @@ def remove_password(index):
          if index_of_line != int(index):
             write.write(line)
 
-   try:
-      for item in tree.get_children():
-         tree.delete(item)
+   for item in tree.get_children():
+      tree.delete(item)
 
-      get_data()
-      for line in ready_data:
-         tree.insert("", "end", values=(line)) 
-   except:
-      pass
+   get_data()
+   for line in ready_data:
+      tree.insert("", "end", values=(line)) 
       
 def password_rating_check(password):
     score = 0
@@ -219,99 +177,7 @@ def password_generator(length, special):
 
    return generated_password
 
-#----------------------------------Main CLI----------------------------------#
-
-def main_cli():
-   style = "cli"
-
-   os.system("cls")
-   os.system(f"title EncryptX {version} ~ Logged In As {username_} ")
-   os.system("mode con:cols=144 lines=41")
-   print(colorama.Fore.LIGHTCYAN_EX + MAIN_MENU + colorama.Fore.RESET)
-   opt = input(colorama.Fore.LIGHTCYAN_EX + "  EncryptX/Console/.. " + colorama.Fore.RESET)
-
-   if opt == "":
-      print(colorama.Fore.RED + "\n" +"  !Invlid Option!" + colorama.Fore.RESET)
-      time.sleep(1)
-      main_cli()
-
-   elif opt == "1":
-      get_data()
-      table_to_print = tabulate(ready_data, headers=["Index", "Name", "Username", "Password", "Rating (1-5)"], tablefmt="double_grid")
-    
-      Length = len(table_to_print.split("\n")[0])
-    
-      os.system(f"cls && mode con:cols={Length} lines=9999")
-      print(colorama.Fore.LIGHTCYAN_EX + table_to_print + colorama.Fore.RESET)
-      input()
-      main_cli()
-
-   elif opt == "2":
-      os.system("cls & mode con:cols=80 lines=16")
-      print(colorama.Fore.RED + "\nYour name, username or password can not be longer than 50 characters.\n" + colorama.Fore.RESET)
-      url_or_program = input(colorama.Fore.LIGHTCYAN_EX + "\nWebsite Or Program Name ~> " + colorama.Fore.RESET)
-      user = input(colorama.Fore.LIGHTCYAN_EX + "Username ~> " + colorama.Fore.RESET)
-      password = input(colorama.Fore.LIGHTCYAN_EX + "Password To Store ~> " + colorama.Fore.RESET)
-
-      if len(password) > 50 or len(user) > 50 or len(url_or_program) > 50:
-         main_cli()
-
-      add_password(url_or_program, user, password)
-      main_cli()
-
-   elif opt == "3":
-      os.system("cls & mode con:cols=80 lines=16")
-      index = input(colorama.Fore.LIGHTCYAN_EX + "\nIndex Of Password To Remove ~> " + colorama.Fore.RESET)
-      remove_password(index)
-      main_cli()
-
-   elif opt == "4":
-      os.system("cls & mode con:cols=80 lines=16")
-      while True:
-         length = int(input(colorama.Fore.LIGHTCYAN_EX + "Enter Password Length ~> " + colorama.Fore.RESET))
-         special = input(colorama.Fore.LIGHTCYAN_EX + "Use Special Characaters? (Yes/No) ~> " + colorama.Fore.RESET)
-         if special.lower() != "yes":
-            special = True
-         if special.lower() != "no":
-            special = False
-         generated_password = password_generator(length, special)
-         print(colorama.Fore.LIGHTCYAN_EX + f"Password ~> {generated_password}" + colorama.Fore.RESET)
-         opt = input(colorama.Fore.LIGHTCYAN_EX + "Use this password (Y/N) ~> " + colorama.Fore.RESET)
-         if opt.lower() == "y":
-            pyperclip.copy(generated_password)
-            print(colorama.Fore.LIGHTCYAN_EX + "Password Copied To Your Clip Board!" + colorama.Fore.RESET)
-            time.sleep(2)
-            break
-         else:
-            continue
-      main_cli()
-      
-   elif opt == "5":
-      hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-      if hwnd:
-         ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
-      main_gui()
-
-   elif opt == "6":
-      exit()
-       
-   else:
-      print(colorama.Fore.RED + "\n" + "  !Invlid Option!" + colorama.Fore.RESET)
-      time.sleep(1)
-      main_cli()
-
-   main_cli()
-
 #----------------------------------Main GUI----------------------------------#
-
-def switch_to_cli(root):
-   time.sleep(0.5)
-   root.destroy()
-   time.sleep(1)
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_SHOW)
-   main_cli()
 
 def refresh_stats(total_passwords):
    get_data()
@@ -462,11 +328,11 @@ def main_gui():
    length = 1
 
    global password_generated_label
-   password_generated_label = customtkinter.CTkLabel(master=tabview.tab("Password Generator"), text=f"Password: Select A Length", font=("Cascadia Code", 18))
+   password_generated_label = customtkinter.CTkLabel(master=tabview.tab("Password Generator"), text=f"Password: Select A Length", font=("Cascadia Code", 16))
    password_generated_label.pack(pady=(20,5), padx=5)
 
    global length_set
-   length_set = customtkinter.CTkLabel(master=tabview.tab("Password Generator"), text=f"Password Length: {int(length)}", font=("Cascadia Code", 18))
+   length_set = customtkinter.CTkLabel(master=tabview.tab("Password Generator"), text=f"Password Length: {int(length)}", font=("Cascadia Code", 16))
    length_set.pack(pady=(20,5), padx=5)
 
    global slider
@@ -496,11 +362,8 @@ def main_gui():
 
    # Settings Page
 
-   switch_mode_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Switch To CLI", font=("Cascadia Code", 18), command=lambda: switch_to_cli(root))
-   switch_mode_button.pack(pady=(10,5), padx=5)
-
    combobox_var = customtkinter.StringVar(value="Dark Mode")
-   combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 18) ,command=combobox_callback, variable=combobox_var)
+   combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16) ,command=combobox_callback, variable=combobox_var)
    combobox_var.set("Dark Mode")
    combobox.pack(pady=(10,5), padx=5)
 
@@ -615,9 +478,6 @@ def login_gui():
 #----------------------------------Boot----------------------------------#
 
 def boot():
-   global style
-   style = "gui"
-
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
    customtkinter.set_appearance_mode("dark")
