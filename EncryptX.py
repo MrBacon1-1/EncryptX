@@ -5,7 +5,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding, hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-import hashlib
 import keyboard
 import pyperclip
 import random
@@ -24,52 +23,59 @@ SW_SHOW = 5
 
 # Encryption Related #
 
-def generate_key(master_password, salt):
-   backend = default_backend()
-   iterations = 100000
+def generate_key(password, iterations=1000):
 
-   master_password_bytes = master_password.encode()
-   salt_bytes = salt.encode()
+   salt = b'~4\xb43\xf6.\xc16P\xc7C\x84\n\xc0\x9e\x96'
 
    kdf = PBKDF2HMAC(
       algorithm=hashes.SHA256(),
-      length=16,
-      salt=salt_bytes,
+      length=32,
+      salt=salt,
       iterations=iterations,
-      backend=backend
+      backend=default_backend()
    )
 
-   key = kdf.derive(master_password_bytes)
+   key = kdf.derive(password.encode('utf-8'))
 
-   return key.hex()
+   return key
 
 def encryption(key, plaintext):
-   backend = default_backend()
-   block_size = algorithms.AES.block_size
+   try:
+      iv = os.urandom(16)
 
-   padder = padding.PKCS7(block_size).padder()
-   padded_plaintext = padder.update(plaintext.encode()) + padder.finalize()
+      padder = padding.PKCS7(algorithms.AES.block_size).padder()
+      plaintext_padded = padder.update(plaintext) + padder.finalize()
 
-   cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
-   encryptor = cipher.encryptor()
+      cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
 
-   ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
+      encryptor = cipher.encryptor()
+      ciphertext = encryptor.update(plaintext_padded) + encryptor.finalize()
 
-   return ciphertext
+      encoded_text = base64.b64encode(iv + ciphertext)
 
-def decryption(key, ciphertext):
-   backend = default_backend()
-   block_size = algorithms.AES.block_size
+      return encoded_text.decode("utf-8")
+    
+   except Exception as e:
+      print("\nError Encrypting! " + str(e))
 
-   cipher = Cipher(algorithms.AES(key.encode()), modes.ECB(), backend=backend)
-   decryptor = cipher.decryptor()
+def decryption (key, ciphertext_encoded):
+   try:
+      ciphertext = base64.b64decode(ciphertext_encoded)
 
-   padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+      iv = ciphertext[:16]
 
-   unpadder = padding.PKCS7(block_size).unpadder()
-   plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
+      cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+      decryptor = cipher.decryptor()
 
-   return plaintext
+      decrypted_padded = decryptor.update(ciphertext[16:]) + decryptor.finalize()
+
+      unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+      decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
+
+      return decrypted
+    
+   except Exception as e:
+      print("\nError Decrypting! " + str(e))
 
 # Keybinds #
 
@@ -82,11 +88,11 @@ def get_data():
    global ready_data
    ready_data = []
 
-   if os.path.isfile("Passwords.txt") != True:
-      with open("Passwords.txt", "w") as w:
+   if os.path.isfile("Passwords.encryptx") != True:
+      with open("Passwords.encryptx", "w") as w:
          w.close()
       
-   with open("Passwords.txt", "rb") as read:
+   with open("Passwords.encryptx", "rb") as read:
       split_data = read.read().split(b"\n")
       read.close()
 
@@ -98,75 +104,68 @@ def get_data():
             user = decryption(key, user).decode()
             password = decryption(key, password).decode()
             rating = password_rating_check(password)
-            ready_data.append([url_or_program, user, password, rating])
-            
-   for ind, x in enumerate(ready_data):
-      x.insert(0, ind) 
+            ready_data.append([url_or_program, user, password, rating]) 
 
 def add_password(url_or_program, user, password):
-   encrypted_password = encryption(key, password)
-   encrypted_username = encryption(key, user)
-   encrypted_url_or_program = encryption(key, url_or_program)
+   password = bytes(password, "utf-8")
+   user = bytes(user, "utf-8")
+   url_or_program = bytes(url_or_program, "utf-8")
+   encrypted_password = (encryption(key, password)).encode("utf-8")
+   encrypted_username = (encryption(key, user)).encode("utf-8")
+   encrypted_url_or_program = (encryption(key, url_or_program)).encode("utf-8")
 
-   with open("Passwords.txt", "ab") as p:
+   with open("Passwords.encryptx", "ab") as p:
       p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
        
 def remove_password(index):
-   with open("Passwords.txt", "rb") as read:
+   with open("Passwords.encryptx", "rb") as read:
       lines = read.readlines()
       read.close()
-   with open("Passwords.txt", "wb") as write:
+   with open("Passwords.encryptx", "wb") as write:
       for index_of_line, line in enumerate(lines):
          if index_of_line != int(index):
-            write.write(line)
-
-   for item in tree.get_children():
-      tree.delete(item)
-
-   get_data()
-   for line in ready_data:
-      tree.insert("", "end", values=(line)) 
+            write.write(line) 
       
 def password_rating_check(password):
-    score = 0
-    lowercase_characters_present = uppercase_characters_present = special_characters_present = numbers_present = False
+   score = 0
+   lowercase_characters_present = uppercase_characters_present = special_characters_present = numbers_present = False
 
-    lowercase_characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    uppercase_characters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-    special_characters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', '\\', ';', ':', "'", '"', ',', '.', '<', '>', '/', '?']
-    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+   lowercase_characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+   uppercase_characters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+   special_characters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', '\\', ';', ':', "'", '"', ',', '.', '<', '>', '/', '?']
+   numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
  
-    for char in lowercase_characters:
-        if char in password:
+   for char in lowercase_characters:
+      if char in password:
          lowercase_characters_present = True
-    for char in uppercase_characters:
-        if char in password:
+   for char in uppercase_characters:
+      if char in password:
          uppercase_characters_present = True
-    for char in special_characters:
-        if char in password:
+   for char in special_characters:
+      if char in password:
          special_characters_present = True
-    for char in numbers:
-        if char in password:
+   for char in numbers:
+      if char in password:
          numbers_present = True
  
-    if lowercase_characters_present == True:
+   if lowercase_characters_present == True:
       score +=1
 
-    if uppercase_characters_present == True:
+   if uppercase_characters_present == True:
       score +=1
 
-    if special_characters_present == True:
+   if special_characters_present == True:
       score +=1
 
-    if numbers_present == True:
+   if numbers_present == True:
       score +=1
 
-    if len(password) >= 8:
+   if len(password) >= 8:
       score +=1
 
-    return score
+   return score
 
-def password_generator(length, special):
+def password_generator(length: int, special: bool):
    if special == "yes":
       characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
    else:
@@ -185,15 +184,11 @@ def refresh_stats(total_passwords):
    total_passwords_value = len(ready_data)
    total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
 
-def refresh_treeview(tree):
-   for item in tree.get_children():
-      tree.delete(item)
+def add_to_list(url, user, password, rating):
+   label = customtkinter.CTkLabel(scrollable_checkbox_frame, text=f"Name/URL >> {url} | User >> {user} | Password >> {password} | Rating >> {rating}")
+   label.pack()
 
-   get_data()
-   for line in ready_data:
-      tree.insert("", "end", values=(line)) 
-
-def add_password_gui(root, tree):
+def add_password_gui(root):
    info_window = customtkinter.CTkToplevel(root)
    info_window.geometry("400x200")
    info_window.title("Add Password")
@@ -204,49 +199,21 @@ def add_password_gui(root, tree):
    username_text_box.pack(padx=10, pady=10)
    password_text_box.pack(padx=10, pady=10)
 
-   def send_info(tree):
+   def send_info():
       name = name_text_box.get()
       username = username_text_box.get()
       password = password_text_box.get()
 
-      add_password(name, username, password)
-
-      for item in tree.get_children():
-         tree.delete(item)
-
-      get_data()
-      for line in ready_data:
-         tree.insert("", "end", values=(line))
+      if name <= 44 or username <= 44 or password <= 44:
+         add_password(name, username, password)
+         add_to_list(name, username, password, password_rating_check(password))
+      else:
+         print("Error! Max Length Of Names, Usernames, Passwords Is 44")
 
       info_window.destroy()
 
-   save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
+   save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info())
    save_button.pack(pady=5)
-
-def copy_user_or_pass(itemid, copy):
-   get_data()
-   data = ready_data[int(itemid)]
-
-   if copy == "user":
-      user = data[2]
-      pyperclip.copy(user)
-   elif copy == "pass":
-      password = data[3]
-      pyperclip.copy(password)
-   else:
-      pass
-
-def on_right_click(event):
-   item = tree.identify_row(event.y)
-   if item != "":
-      item_id = tree.item(item, "values")[0]
-
-   if item:
-      menu = tkinter.Menu(root, tearoff=0)
-      menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
-      menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
-      menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
-      menu.tk_popup(event.x_root, event.y_root)
 
 def combobox_callback(choice):
    if choice == "Dark Mode":
@@ -257,11 +224,10 @@ def combobox_callback(choice):
       pass
 
 def slider_event(value):
-   global length, password_generated
-   length = slider.get()
+   global password_generated
    special = use_special.get()
-   password_generated = password_generator(int(length), special)
-   length_set.configure(text=f"Password Length: {int(length)}")
+   password_generated = password_generator(int(value), special)
+   length_set.configure(text=f"Password Length: {int(value)}")
    password_generated_label.configure(text=f"Password: {password_generated}")
    
 def checkbox_event():
@@ -272,8 +238,7 @@ def checkbox_event():
    password_generated_label.configure(text=f"Password: {password_generated}")
 
 def main_gui():
-
-   global tree, root
+   global root, scrollable_checkbox_frame
 
    root = customtkinter.CTk()
    root.geometry("1400x800")
@@ -293,35 +258,14 @@ def main_gui():
    except:
       pass  
 
-   tree = tkinter.ttk.Treeview(master=tabview.tab("Passwords"), columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
+   scrollable_checkbox_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Passwords"), width=1310, height=600)
+   scrollable_checkbox_frame.pack(pady=5, padx=5)
 
-   scrollbar = tkinter.ttk.Scrollbar(tree, orient=tkinter.VERTICAL, command=tree.yview)
-   tree.configure(yscroll=scrollbar.set) 
+   for item in ready_data:
+      add_to_list(item[0], item[1], item[2], item[3])
 
-   tree.heading("ID", text="ID")
-   tree.heading("Name/URL", text="Name/URL")
-   tree.heading("Username", text="Username")
-   tree.heading("Password", text="Password")
-   tree.heading("Password_Rating", text="Password Rating (1-5)")  
-
-   for line in ready_data:
-      tree.insert("", "end", values=(line)) 
-
-   tree.column("ID", anchor="center")
-   tree.column("Name/URL", anchor="center")
-   tree.column("Username", anchor="center")
-   tree.column("Password", anchor="center")
-   tree.column("Password_Rating", anchor="center") 
-
-   tree.pack(fill="both", expand=True) 
-
-   tree.bind("<Button-3>", on_right_click)
-
-   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
-   add_password_button.pack(pady=(10,5), padx=5)
-
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview(tree))
-   refresh_button.pack() 
+   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root))
+   add_password_button.pack(pady=15, padx=5)
 
    # Password Generator
 
@@ -336,7 +280,7 @@ def main_gui():
    length_set.pack(pady=(20,5), padx=5)
 
    global slider
-   slider = customtkinter.CTkSlider(master=tabview.tab("Password Generator"), from_=1, to=50, command=slider_event)
+   slider = customtkinter.CTkSlider(master=tabview.tab("Password Generator"), from_=1, to=44, command=slider_event)
    slider.pack(pady=(10,5), padx=5)
    slider.configure(number_of_steps=49)
    slider.set(1)
@@ -374,22 +318,16 @@ def main_gui():
 def login_check(master_pass, username):
    global username_, key
    username_ = username
-   
-   if len(master_pass) < 8 or len(username) < 8:
-      login.destroy()
-      exit()
 
-   salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
-   key = generate_key(master_pass, salt)
-   encrypted_password = encryption(key, master_pass)
+   key = generate_key(master_pass)
 
-   hash_password = hashlib.md5(encrypted_password).hexdigest()
-   with open("UserData.txt", "r") as r:
+   with open("UserData.encryptx", "r") as r:
       userdata = r.read().split("\n")
       r.close()
-   
+
    for user in userdata:
-      if user.split("04n$b3e0R5K*")[0] == username and user.split("04n$b3e0R5K*")[1] == hash_password:
+      decrypted_password = decryption(key, user.split("04n$b3e0R5K*")[1])
+      if user.split("04n$b3e0R5K*")[0] == username and decrypted_password.decode("utf-8") == master_pass:
          login.destroy()
          main_gui()
       else:
@@ -400,24 +338,16 @@ def login_create(master_pass, second_entry, username):
    global username_, key
    username_ = username
 
-   if len(username) < 8:
-      login.destroy()
-      exit()
-   if len(master_pass) < 8 or master_pass != second_entry:
-      login.destroy()
-      exit()
-   if len(master_pass) > 64 or len(username) > 64:
+   if master_pass != second_entry:
       login.destroy()
       exit()
 
+   key = generate_key(master_pass)
+   plaintext = bytes(master_pass, "utf-8")
+   encrypted_password = encryption(key, plaintext)
 
-   salt = "UKXcH*=/:PSOF(*8y3Sau8ZVq/b(p1OVLA2gY)R.gbf@gx--48"
-   key = generate_key(master_pass, salt)
-   encrypted_password = encryption(key, master_pass)
-   hash_password = hashlib.md5(encrypted_password).hexdigest()
-
-   with open("UserData.txt", "w") as w:
-      w.write(f"{username}04n$b3e0R5K*{hash_password}")
+   with open("UserData.encryptx", "w") as w:
+      w.write(f"{username}04n$b3e0R5K*{encrypted_password}")
       w.close()
 
    login.destroy()
@@ -482,7 +412,7 @@ def boot():
 
    customtkinter.set_appearance_mode("dark")
 
-   if os.path.exists("UserData.txt"):
+   if os.path.exists("UserData.encryptx"):
       new_user = False
    else:
       new_user = True
