@@ -204,7 +204,7 @@ def add_password_gui(root):
       username = username_text_box.get()
       password = password_text_box.get()
 
-      if name <= 44 or username <= 44 or password <= 44:
+      if len(name) <= 44 or len(username) <= 44 or len(password) <= 44:
          add_password(name, username, password)
          add_to_list(name, username, password, password_rating_check(password))
       else:
