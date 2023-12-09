@@ -106,6 +106,9 @@ def get_data():
             rating = password_rating_check(password)
             ready_data.append([url_or_program, user, password, rating]) 
 
+   for ind, x in enumerate(ready_data):
+      x.insert(0, ind) 
+
 def add_password(url_or_program, user, password):
    password = bytes(password, "utf-8")
    user = bytes(user, "utf-8")
@@ -118,13 +121,23 @@ def add_password(url_or_program, user, password):
       p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
        
 def remove_password(index):
-   with open("Passwords.encryptx", "rb") as read:
+   with open("Passwords.encryptX", "rb") as read:
       lines = read.readlines()
       read.close()
-   with open("Passwords.encryptx", "wb") as write:
+   with open("Passwords.encryptX", "wb") as write:
       for index_of_line, line in enumerate(lines):
          if index_of_line != int(index):
-            write.write(line) 
+            write.write(line)
+
+   try:
+      for item in tree.get_children():
+         tree.delete(item)
+
+      get_data()
+      for line in ready_data:
+         tree.insert("", "end", values=(line)) 
+   except:
+      pass
       
 def password_rating_check(password):
    score = 0
@@ -184,11 +197,15 @@ def refresh_stats(total_passwords):
    total_passwords_value = len(ready_data)
    total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
 
-def add_to_list(url, user, password, rating):
-   label = customtkinter.CTkLabel(scrollable_checkbox_frame, text=f"Name/URL >> {url} | User >> {user} | Password >> {password} | Rating >> {rating}")
-   label.pack()
+def refresh_treeview(tree):
+   for item in tree.get_children():
+      tree.delete(item)
 
-def add_password_gui(root):
+   get_data()
+   for line in ready_data:
+      tree.insert("", "end", values=(line)) 
+
+def add_password_gui(root, tree):
    info_window = customtkinter.CTkToplevel(root)
    info_window.geometry("400x200")
    info_window.title("Add Password")
@@ -199,21 +216,57 @@ def add_password_gui(root):
    username_text_box.pack(padx=10, pady=10)
    password_text_box.pack(padx=10, pady=10)
 
-   def send_info():
+   def send_info(tree):
       name = name_text_box.get()
       username = username_text_box.get()
       password = password_text_box.get()
 
-      if len(name) <= 44 or len(username) <= 44 or len(password) <= 44:
-         add_password(name, username, password)
-         add_to_list(name, username, password, password_rating_check(password))
-      else:
-         print("Error! Max Length Of Names, Usernames, Passwords Is 44")
+      add_password(name, username, password)
+
+      for item in tree.get_children():
+         tree.delete(item)
+
+      get_data()
+      for line in ready_data:
+         tree.insert("", "end", values=(line))
 
       info_window.destroy()
 
-   save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info())
+   save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
    save_button.pack(pady=5)
+
+def copy_user_or_pass(itemid, copy):
+   get_data()
+   data = ready_data[int(itemid)]
+
+   if copy == "user":
+      user = data[2]
+      pyperclip.copy(user)
+   elif copy == "pass":
+      password = data[3]
+      pyperclip.copy(password)
+   else:
+      pass
+
+def on_right_click(event):
+   item = tree.identify_row(event.y)
+   if item != "":
+      item_id = tree.item(item, "values")[0]
+
+   if item:
+      menu = tkinter.Menu(root, tearoff=0)
+      menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
+      menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
+      menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
+      menu.tk_popup(event.x_root, event.y_root)
+
+def combobox_callback(choice):
+   if choice == "Dark Mode":
+      customtkinter.set_appearance_mode("dark")
+   elif choice == "Light Mode":
+      customtkinter.set_appearance_mode("light")
+   else:
+      pass
 
 def combobox_callback(choice):
    if choice == "Dark Mode":
@@ -238,7 +291,7 @@ def checkbox_event():
    password_generated_label.configure(text=f"Password: {password_generated}")
 
 def main_gui():
-   global root, scrollable_checkbox_frame
+   global root, tree
 
    root = customtkinter.CTk()
    root.geometry("1400x800")
@@ -258,14 +311,35 @@ def main_gui():
    except:
       pass  
 
-   scrollable_checkbox_frame = customtkinter.CTkScrollableFrame(master=tabview.tab("Passwords"), width=1310, height=600)
-   scrollable_checkbox_frame.pack(pady=5, padx=5)
+   tree = tkinter.ttk.Treeview(master=tabview.tab("Passwords"), columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
 
-   for item in ready_data:
-      add_to_list(item[0], item[1], item[2], item[3])
+   scrollbar = tkinter.ttk.Scrollbar(tree, orient=tkinter.VERTICAL, command=tree.yview)
+   tree.configure(yscroll=scrollbar.set) 
 
-   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root))
-   add_password_button.pack(pady=15, padx=5)
+   tree.heading("ID", text="ID")
+   tree.heading("Name/URL", text="Name/URL")
+   tree.heading("Username", text="Username")
+   tree.heading("Password", text="Password")
+   tree.heading("Password_Rating", text="Password Rating (1-5)")  
+
+   for line in ready_data:
+      tree.insert("", "end", values=(line)) 
+
+   tree.column("ID", anchor="center")
+   tree.column("Name/URL", anchor="center")
+   tree.column("Username", anchor="center")
+   tree.column("Password", anchor="center")
+   tree.column("Password_Rating", anchor="center") 
+
+   tree.pack(fill="both", expand=True) 
+
+   tree.bind("<Button-3>", on_right_click)
+
+   add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
+   add_password_button.pack(pady=(10,5), padx=5)
+
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview(tree))
+   refresh_button.pack() 
 
    # Password Generator
 
