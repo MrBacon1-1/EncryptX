@@ -323,7 +323,7 @@ def main_gui():
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
    for line in ready_data:
-      tree.insert("", "end", values=(line)) 
+      tree.insert("", "end", values=(line))
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
@@ -401,7 +401,8 @@ def login_check(master_pass, username):
 
    for user in userdata:
       decrypted_password = decryption(key, user.split("04n$b3e0R5K*")[1])
-      if user.split("04n$b3e0R5K*")[0] == username and decrypted_password.decode("utf-8") == master_pass:
+      decrypted_username = decryption(key, user.split("04n$b3e0R5K*")[0])
+      if decrypted_username.decode("utf-8") == username and decrypted_password.decode("utf-8") == master_pass:
          login.destroy()
          main_gui()
       else:
@@ -417,11 +418,13 @@ def login_create(master_pass, second_entry, username):
       exit()
 
    key = generate_key(master_pass)
-   plaintext = bytes(master_pass, "utf-8")
-   encrypted_password = encryption(key, plaintext)
+   encoded_password = bytes(master_pass, "utf-8")
+   encrypted_password = encryption(key, encoded_password)
+   encoded_username = bytes(username, "utf-8")
+   encrypted_username = encryption(key, encoded_username)
 
    with open("UserData.encryptx", "w") as w:
-      w.write(f"{username}04n$b3e0R5K*{encrypted_password}")
+      w.write(f"{encrypted_username}04n$b3e0R5K*{encrypted_password}")
       w.close()
 
    login.destroy()
