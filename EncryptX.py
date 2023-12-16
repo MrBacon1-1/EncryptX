@@ -17,7 +17,7 @@ import sys
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0"
+version = "v1.0.0a"
 SW_HIDE = 0
 SW_SHOW = 5
 
