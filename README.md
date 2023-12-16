@@ -39,7 +39,7 @@ I chose to implement AES (Advanced Encryption Standard) encryption for my passwo
    How do I use the program?
 </h2>
 
-## Downloading the Exe File (Recommended) (Currently Not Availible):
+## Downloading the Exe File (Recommended):
 
 The most straightforward way to use our password manager is by downloading the pre-compiled executable (exe) file from our releases page. 
 Simply visit the releases page and find the latest version available for download.
