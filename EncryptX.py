@@ -12,6 +12,8 @@ import base64
 import tkinter
 import customtkinter
 import ctypes
+import gc
+import sys
 
 #----------------------------------Constants----------------------------------#
 
@@ -20,8 +22,6 @@ SW_HIDE = 0
 SW_SHOW = 5
 
 #----------------------------------Functions----------------------------------#
-
-# Encryption Related #
 
 def generate_key(password, iterations=1000):
 
@@ -79,8 +79,31 @@ def decryption (key, ciphertext_encoded):
 
 # Keybinds #
 
+def lock_bind():
+   queue = [key, ready_data, username_]
+
+   for item in queue:
+      try:
+         del item
+      except:
+         pass
+
+   gc.collect()
+
+   os.execl(sys.executable, sys.executable, *sys.argv)
+
 def exit_bind():
-   os.system(f"taskkill /F /PID {os.getpid()}")
+   try:
+      root.destroy()
+   except:
+      pass
+   try:
+      login.destroy()
+   except:
+      pass
+
+   gc.collect()
+   sys.exit(0)
 
 # Password Related #
 
@@ -109,6 +132,9 @@ def get_data():
    for ind, x in enumerate(ready_data):
       x.insert(0, ind) 
 
+   del split_data
+   del data
+
 def add_password(url_or_program, user, password):
    password = bytes(password, "utf-8")
    user = bytes(user, "utf-8")
@@ -116,6 +142,10 @@ def add_password(url_or_program, user, password):
    encrypted_password = (encryption(key, password)).encode("utf-8")
    encrypted_username = (encryption(key, user)).encode("utf-8")
    encrypted_url_or_program = (encryption(key, url_or_program)).encode("utf-8")
+
+   del password
+   del user
+   del url_or_program
 
    with open("Passwords.encryptx", "ab") as p:
       p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
@@ -176,6 +206,8 @@ def password_rating_check(password):
    if len(password) >= 8:
       score +=1
 
+   del password
+
    return score
 
 def password_generator(length: int, special: bool):
@@ -230,6 +262,10 @@ def add_password_gui(root, tree):
       for line in ready_data:
          tree.insert("", "end", values=(line))
 
+      del password
+      del username
+      del name
+
       info_window.destroy()
 
    save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
@@ -242,9 +278,11 @@ def copy_user_or_pass(itemid, copy):
    if copy == "user":
       user = data[2]
       pyperclip.copy(user)
+      del user
    elif copy == "pass":
       password = data[3]
       pyperclip.copy(password)
+      del password
    else:
       pass
 
@@ -293,6 +331,8 @@ def checkbox_event():
 def main_gui():
    global root, tree
 
+   keyboard.add_hotkey('Ctrl+Alt+L', lock_bind)
+
    root = customtkinter.CTk()
    root.geometry("1400x800")
    root.title(f"EncryptX {version} ~ Logged In As {username_}")
@@ -301,6 +341,7 @@ def main_gui():
    tabview.pack(pady=5,padx=5)
    tabview.add("Passwords")
    tabview.add("Password Generator") 
+   tabview.add("Binds")
    tabview.add("Stats")
    tabview.add("Settings") 
 
@@ -366,6 +407,17 @@ def main_gui():
    copy_password_button = customtkinter.CTkButton(master=tabview.tab("Password Generator"), text="Copy Password", font=("Cascadia Code", 18), command=lambda: pyperclip.copy(password_generated))
    copy_password_button.pack(pady=(10,5), padx=5)
 
+   # Binds
+
+   title_binds = customtkinter.CTkLabel(master=tabview.tab("Binds"), text="EncryptX Binds", font=("Cascadia Code", 22))
+   title_binds.pack(pady=15, padx=10)
+
+   exit_bind_label = customtkinter.CTkLabel(master=tabview.tab("Binds"), text="Exit >> Ctrl+Alt+E", font=("Cascadia Code", 12))
+   exit_bind_label.pack(pady=(10,5), padx=5)
+
+   lock_bind_label = customtkinter.CTkLabel(master=tabview.tab("Binds"), text="Lock >> Ctrl+Alt+L", font=("Cascadia Code", 12))
+   lock_bind_label.pack(pady=(10,5), padx=5)
+
    # Stats Page
 
    title_stats = customtkinter.CTkLabel(master=tabview.tab("Stats"), text="EncryptX Stats", font=("Cascadia Code", 22))
@@ -402,12 +454,18 @@ def login_check(master_pass, username):
    for user in userdata:
       decrypted_password = decryption(key, user.split("04n$b3e0R5K*")[1])
       decrypted_username = decryption(key, user.split("04n$b3e0R5K*")[0])
-      if decrypted_username.decode("utf-8") == username and decrypted_password.decode("utf-8") == master_pass:
-         login.destroy()
-         main_gui()
-      else:
-         login.destroy()
-         exit()
+      if decrypted_password or decrypted_username != None:
+         if decrypted_username.decode("utf-8") == username and decrypted_password.decode("utf-8") == master_pass:
+            login.destroy()
+            del master_pass
+            del decrypted_password
+            main_gui()
+         else:
+            login.destroy()
+            exit()
+
+      login.destroy()
+      exit()
              
 def login_create(master_pass, second_entry, username):
    global username_, key
@@ -426,6 +484,8 @@ def login_create(master_pass, second_entry, username):
    with open("UserData.encryptx", "w") as w:
       w.write(f"{encrypted_username}04n$b3e0R5K*{encrypted_password}")
       w.close()
+
+   del master_pass
 
    login.destroy()
    main_gui()
