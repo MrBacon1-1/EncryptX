@@ -45,7 +45,6 @@ The most straightforward way to use our password manager is by downloading the p
 Simply visit the releases page and find the latest version available for download.
 Once the download is complete, all you need to do is run the exe file.
 In case you encounter any issues or have suggestions for improvement, we encourage you to report them by opening an issue on our GitHub repository. 
-Your feedback is valuable as it helps us refine the password manager further.
 
 ## Installing the Python Version (For Advanced Users):
 
@@ -60,10 +59,6 @@ To run the password manager, you will need to ensure a few Python packages are i
 This command will automatically install the necessary dependencies, ensuring the password manager functions smoothly.
 Once everything is set up, open the Python file, and you will have access to the password manager's full range of features. Just like the exe version, you can securely store, view, and remove passwords.
 Please note that while our password manager is fully functional and capable of securely storing, viewing, and removing passwords, it is an ongoing project. We continuously work on improving and adding new features to make it even better. While the main features are already working flawlessly, there may still be some additional functionality we are actively developing.
-
-We value your support and encouragement as we progress with this project. 
-Your feedback, suggestions, and bug reports are vital in shaping the future of our password manager. 
-As we strive to create a robust and reliable solution, we appreciate your understanding and patience.
 
 <h2 align="center">
    Support the Project!
