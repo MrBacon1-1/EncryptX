@@ -17,7 +17,7 @@ import sys
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.0a"
+version = "v1.0.1a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -80,7 +80,7 @@ def decryption (key, ciphertext_encoded):
 # Keybinds #
 
 def lock_bind():
-   queue = [key, ready_data, username_]
+   queue = [key, ready_data]
 
    for item in queue:
       try:
@@ -335,7 +335,7 @@ def main_gui():
 
    root = customtkinter.CTk()
    root.geometry("1400x800")
-   root.title(f"EncryptX {version} ~ Logged In As {username_}")
+   root.title(f"EncryptX {version}")
 
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
@@ -441,35 +441,31 @@ def main_gui():
 
 #----------------------------------Login Functions----------------------------------#
 
-def login_check(master_pass, username):
-   global username_, key
-   username_ = username
+def login_check(master_pass):
+   global key
 
    key = generate_key(master_pass)
 
    with open("UserData.encryptx", "r") as r:
-      userdata = r.read().split("\n")
+      userdata = r.read()
       r.close()
 
-   for user in userdata:
-      decrypted_password = decryption(key, user.split("04n$b3e0R5K*")[1])
-      decrypted_username = decryption(key, user.split("04n$b3e0R5K*")[0])
-      if decrypted_password or decrypted_username != None:
-         if decrypted_username.decode("utf-8") == username and decrypted_password.decode("utf-8") == master_pass:
-            login.destroy()
-            del master_pass
-            del decrypted_password
-            main_gui()
-         else:
-            login.destroy()
-            exit()
+   decrypted_password = decryption(key, userdata)
+   if decrypted_password != None:
+      if decrypted_password.decode("utf-8") == master_pass:
+         login.destroy()
+         del master_pass
+         del decrypted_password
+         main_gui()
+      else:
+         login.destroy()
+         exit()
 
-      login.destroy()
-      exit()
+   login.destroy()
+   exit()
              
-def login_create(master_pass, second_entry, username):
-   global username_, key
-   username_ = username
+def login_create(master_pass, second_entry):
+   global key
 
    if master_pass != second_entry:
       login.destroy()
@@ -478,11 +474,9 @@ def login_create(master_pass, second_entry, username):
    key = generate_key(master_pass)
    encoded_password = bytes(master_pass, "utf-8")
    encrypted_password = encryption(key, encoded_password)
-   encoded_username = bytes(username, "utf-8")
-   encrypted_username = encryption(key, encoded_username)
 
    with open("UserData.encryptx", "w") as w:
-      w.write(f"{encrypted_username}04n$b3e0R5K*{encrypted_password}")
+      w.write(encrypted_password)
       w.close()
 
    del master_pass
@@ -505,14 +499,12 @@ def login_creation_gui():
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 32))
    title.pack(pady=20, padx=5)
 
-   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 14))
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*")
    second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*")
-   username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
    second_password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Create Account", font=("Cascadia Code", 14), command=lambda:login_create(password_box.get(), second_password_box.get(), username_box.get()))
+   button = customtkinter.CTkButton(master=login, text="Create Account", font=("Cascadia Code", 14), command=lambda:login_create(password_box.get(), second_password_box.get()))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
@@ -532,12 +524,10 @@ def login_gui():
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 22))
    title.pack(pady=20, padx=5)
 
-   username_box = customtkinter.CTkEntry(master=login, placeholder_text="Username", font=("Cascadia Code", 14))
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*")
-   username_box.pack(pady=20, padx=5)
    password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda:login_check(password_box.get(), username_box.get()))
+   button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda:login_check(password_box.get()))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
