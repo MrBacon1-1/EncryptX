@@ -290,8 +290,6 @@ def show_password(tree, item):
    for item in tree.get_children():
       tree.delete(item)
 
-   print(data)
-
    get_data()
    for line in ready_data:
       if line == data:
