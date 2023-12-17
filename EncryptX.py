@@ -17,7 +17,7 @@ import sys
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.1a"
+version = "v1.0.2a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -235,7 +235,11 @@ def refresh_treeview(tree):
 
    get_data()
    for line in ready_data:
-      tree.insert("", "end", values=(line)) 
+      modified_line = list(line)
+      modified_line[3] = "••••••••"
+      modified_line = tuple(modified_line)
+      
+      tree.insert("", "end", values=modified_line)
 
 def add_password_gui(root, tree):
    info_window = customtkinter.CTkToplevel(root)
@@ -254,13 +258,7 @@ def add_password_gui(root, tree):
       password = password_text_box.get()
 
       add_password(name, username, password)
-
-      for item in tree.get_children():
-         tree.delete(item)
-
-      get_data()
-      for line in ready_data:
-         tree.insert("", "end", values=(line))
+      refresh_treeview(tree)
 
       del password
       del username
@@ -296,6 +294,8 @@ def on_right_click(event):
       menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
+      # menu.add_command(label="Show Password", command=lambda:show_password(tree, item))
+      # menu.add_command(label="Hide Password", command=lambda:hide_password(tree, item))
       menu.tk_popup(event.x_root, event.y_root)
 
 def combobox_callback(choice):
@@ -363,8 +363,7 @@ def main_gui():
    tree.heading("Password", text="Password")
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
-   for line in ready_data:
-      tree.insert("", "end", values=(line))
+   refresh_treeview(tree)
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
