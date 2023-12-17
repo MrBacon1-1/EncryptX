@@ -17,7 +17,7 @@ import sys
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.2a"
+version = "v1.0.3a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -284,6 +284,25 @@ def copy_user_or_pass(itemid, copy):
    else:
       pass
 
+def show_password(tree, item):
+   data = ready_data[int(item)]
+
+   for item in tree.get_children():
+      tree.delete(item)
+
+   print(data)
+
+   get_data()
+   for line in ready_data:
+      if line == data:
+         tree.insert("", "end", values=line)
+      else:
+         modified_line = list(line)
+         modified_line[3] = "••••••••"
+         modified_line = tuple(modified_line)
+
+         tree.insert("", "end", values=modified_line)
+
 def on_right_click(event):
    item = tree.identify_row(event.y)
    if item != "":
@@ -294,8 +313,8 @@ def on_right_click(event):
       menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
-      # menu.add_command(label="Show Password", command=lambda:show_password(tree, item))
-      # menu.add_command(label="Hide Password", command=lambda:hide_password(tree, item))
+      menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
+      menu.add_command(label="Hide Password", command=lambda:refresh_treeview(tree))
       menu.tk_popup(event.x_root, event.y_root)
 
 def combobox_callback(choice):
