@@ -22,7 +22,7 @@ import keyboard
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.4a"
+version = "v1.0.5a"
 SW_HIDE = 0
 SW_SHOW = 5
 
