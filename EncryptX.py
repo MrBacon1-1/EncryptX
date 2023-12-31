@@ -10,6 +10,7 @@ import pyperclip
 import random
 import base64
 import tkinter
+from tkinter import ttk
 import customtkinter
 import ctypes
 import gc
@@ -17,76 +18,74 @@ import sys
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.3a"
+version = "v1.0.4a"
 SW_HIDE = 0
 SW_SHOW = 5
 
 #----------------------------------Functions----------------------------------#
 
-def generate_key(password, iterations=1000):
+class CryptoHandler():
+   def generate_key(self, password):
 
-   salt = b'~4\xb43\xf6.\xc16P\xc7C\x84\n\xc0\x9e\x96'
+      salt = b'~4\xb43\xf6.\xc16P\xc7C\x84\n\xc0\x9e\x96'
 
-   kdf = PBKDF2HMAC(
-      algorithm=hashes.SHA256(),
-      length=32,
-      salt=salt,
-      iterations=iterations,
-      backend=default_backend()
-   )
+      kdf = PBKDF2HMAC(
+         algorithm=hashes.SHA256(),
+         length=32,
+         salt=salt,
+         iterations=1000,
+         backend=default_backend()
+      )
 
-   key = kdf.derive(password.encode('utf-8'))
+      key = kdf.derive(password.encode('utf-8'))
 
-   return key
+      return key
 
-def encryption(key, plaintext):
-   try:
-      iv = os.urandom(16)
+   def encryption(self, key, plaintext):
+      try:
+         iv = os.urandom(16)
 
-      padder = padding.PKCS7(algorithms.AES.block_size).padder()
-      plaintext_padded = padder.update(plaintext) + padder.finalize()
+         padder = padding.PKCS7(algorithms.AES.block_size).padder()
+         plaintext_padded = padder.update(plaintext) + padder.finalize()
 
-      cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+         cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
 
-      encryptor = cipher.encryptor()
-      ciphertext = encryptor.update(plaintext_padded) + encryptor.finalize()
+         encryptor = cipher.encryptor()
+         ciphertext = encryptor.update(plaintext_padded) + encryptor.finalize()
 
-      encoded_text = base64.b64encode(iv + ciphertext)
+         encoded_text = base64.b64encode(iv + ciphertext)
 
-      return encoded_text.decode("utf-8")
-    
-   except Exception as e:
-      print("\nError Encrypting! " + str(e))
+         return encoded_text.decode("utf-8")
 
-def decryption (key, ciphertext_encoded):
-   try:
-      ciphertext = base64.b64decode(ciphertext_encoded)
+      except Exception as e:
+         print("\nError Encrypting! " + str(e))
 
-      iv = ciphertext[:16]
+   def decryption (self, key, ciphertext_encoded):
+      try:
+         ciphertext = base64.b64decode(ciphertext_encoded)
 
-      cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
-      decryptor = cipher.decryptor()
+         iv = ciphertext[:16]
 
-      decrypted_padded = decryptor.update(ciphertext[16:]) + decryptor.finalize()
+         cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+         decryptor = cipher.decryptor()
 
-      unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
-      decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
+         decrypted_padded = decryptor.update(ciphertext[16:]) + decryptor.finalize()
 
-      return decrypted
-    
-   except Exception as e:
-      print("\nError Decrypting! " + str(e))
+         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+         decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
+
+         return decrypted
+
+      except Exception as e:
+         print("\nError Decrypting! " + str(e))
 
 # Keybinds #
 
 def lock_bind():
-   queue = [key, ready_data]
-
-   for item in queue:
-      try:
-         del item
-      except:
-         pass
+   try:
+      del key
+   except:
+      pass
 
    gc.collect()
 
@@ -108,7 +107,6 @@ def exit_bind():
 # Password Related #
 
 def get_data():
-   global ready_data
    ready_data = []
 
    if os.path.isfile("Passwords.encryptx") != True:
@@ -123,29 +121,28 @@ def get_data():
          if data:
             url_or_program, user, password = data.split(b"04n$b3e0R5K*")
             url_or_program, user, password = base64.b64decode(url_or_program), base64.b64decode(user), base64.b64decode(password)
-            url_or_program = decryption(key, url_or_program).decode()
-            user = decryption(key, user).decode()
-            password = decryption(key, password).decode()
+            url_or_program = crypto_handler.decryption(key, url_or_program).decode()
+            user = crypto_handler.decryption(key, user).decode()
+            password = crypto_handler.decryption(key, password).decode()
             rating = password_rating_check(password)
             ready_data.append([url_or_program, user, password, rating]) 
 
    for ind, x in enumerate(ready_data):
       x.insert(0, ind) 
 
-   del split_data
-   del data
+   del split_data, data
+
+   return ready_data
 
 def add_password(url_or_program, user, password):
    password = bytes(password, "utf-8")
    user = bytes(user, "utf-8")
    url_or_program = bytes(url_or_program, "utf-8")
-   encrypted_password = (encryption(key, password)).encode("utf-8")
-   encrypted_username = (encryption(key, user)).encode("utf-8")
-   encrypted_url_or_program = (encryption(key, url_or_program)).encode("utf-8")
+   encrypted_password = (crypto_handler.encryption(key, password)).encode("utf-8")
+   encrypted_username = (crypto_handler.encryption(key, user)).encode("utf-8")
+   encrypted_url_or_program = (crypto_handler.encryption(key, url_or_program)).encode("utf-8")
 
-   del password
-   del user
-   del url_or_program
+   del password, url_or_program, user
 
    with open("Passwords.encryptx", "ab") as p:
       p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
@@ -163,9 +160,10 @@ def remove_password(index):
       for item in tree.get_children():
          tree.delete(item)
 
-      get_data()
+      ready_data = get_data()
       for line in ready_data:
          tree.insert("", "end", values=(line)) 
+      del ready_data
    except:
       pass
       
@@ -224,16 +222,17 @@ def password_generator(length: int, special: bool):
 #----------------------------------Main GUI----------------------------------#
 
 def refresh_stats(total_passwords):
-   get_data()
+   ready_data = get_data()
    global total_passwords_value
    total_passwords_value = len(ready_data)
    total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
+   del ready_data
 
 def refresh_treeview(tree):
    for item in tree.get_children():
       tree.delete(item)
 
-   get_data()
+   ready_data = get_data()
    for line in ready_data:
       modified_line = list(line)
       modified_line[3] = "••••••••"
@@ -260,9 +259,7 @@ def add_password_gui(root, tree):
       add_password(name, username, password)
       refresh_treeview(tree)
 
-      del password
-      del username
-      del name
+      del password, name, username
 
       info_window.destroy()
 
@@ -270,27 +267,27 @@ def add_password_gui(root, tree):
    save_button.pack(pady=5)
 
 def copy_user_or_pass(itemid, copy):
-   get_data()
+   ready_data = get_data()
    data = ready_data[int(itemid)]
 
    if copy == "user":
       user = data[2]
       pyperclip.copy(user)
-      del user
+      del user, ready_data
    elif copy == "pass":
       password = data[3]
       pyperclip.copy(password)
-      del password
+      del password, ready_data
    else:
       pass
 
 def show_password(tree, item):
+   ready_data = get_data()
    data = ready_data[int(item)]
 
    for item in tree.get_children():
       tree.delete(item)
 
-   get_data()
    for line in ready_data:
       if line == data:
          tree.insert("", "end", values=line)
@@ -300,6 +297,8 @@ def show_password(tree, item):
          modified_line = tuple(modified_line)
 
          tree.insert("", "end", values=modified_line)
+      
+   del data, modified_line, line, ready_data
 
 def on_right_click(event):
    item = tree.identify_row(event.y)
@@ -365,11 +364,14 @@ def main_gui():
    # Password Page   
 
    try: 
-      get_data()
+      ready_data = get_data()
    except:
       pass  
 
-   tree = tkinter.ttk.Treeview(master=tabview.tab("Passwords"), columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings")
+   style = tkinter.ttk.Style(root)
+   style.theme_use("clam")
+   style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
+   tree = tkinter.ttk.Treeview(master=tabview.tab("Passwords"), columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings", style="Treeview")
 
    scrollbar = tkinter.ttk.Scrollbar(tree, orient=tkinter.VERTICAL, command=tree.yview)
    tree.configure(yscroll=scrollbar.set) 
@@ -460,18 +462,17 @@ def main_gui():
 def login_check(master_pass):
    global key
 
-   key = generate_key(master_pass)
+   key = crypto_handler.generate_key(master_pass)
 
    with open("UserData.encryptx", "r") as r:
       userdata = r.read()
       r.close()
 
-   decrypted_password = decryption(key, userdata)
+   decrypted_password = crypto_handler.decryption(key, userdata)
    if decrypted_password != None:
       if decrypted_password.decode("utf-8") == master_pass:
          login.destroy()
-         del master_pass
-         del decrypted_password
+         del master_pass, decrypted_password
          main_gui()
       else:
          login.destroy()
@@ -487,9 +488,9 @@ def login_create(master_pass, second_entry):
       login.destroy()
       exit()
 
-   key = generate_key(master_pass)
+   key = crypto_handler.generate_key(master_pass)
    encoded_password = bytes(master_pass, "utf-8")
-   encrypted_password = encryption(key, encoded_password)
+   encrypted_password = crypto_handler.encryption(key, encoded_password)
 
    with open("UserData.encryptx", "w") as w:
       w.write(encrypted_password)
@@ -551,7 +552,11 @@ def login_gui():
 #----------------------------------Boot----------------------------------#
 
 def boot():
+   global crypto_handler
+
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
+
+   crypto_handler = CryptoHandler()
 
    customtkinter.set_appearance_mode("dark")
 
