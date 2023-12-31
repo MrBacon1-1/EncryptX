@@ -1,6 +1,7 @@
 #----------------------------------Modules----------------------------------#
 
 import os
+import time
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding, hashes
 from cryptography.hazmat.backends import default_backend
@@ -15,6 +16,10 @@ import customtkinter
 import ctypes
 import gc
 import sys
+import pygetwindow as gw
+from CTkMessagebox import CTkMessagebox
+import pyautogui
+import keyboard
 
 #----------------------------------Constants----------------------------------#
 
@@ -300,6 +305,28 @@ def show_password(tree, item):
       
    del data, modified_line, line, ready_data
 
+def autotype(items: list):
+    DELAY = 0.05
+    windows = list(filter(None, gw.getAllTitles()))
+    msg = CTkMessagebox(title="Autotype", message=f"Auto Type In Previous Window?",
+                        icon="question", option_1="No", option_2="Yes", width=300, height=100)
+    response = msg.get()
+    if response=="Yes":
+        win = gw.getWindowsWithTitle(windows[1])[0]
+        win.activate()
+        time.sleep(2)
+        if len(items) > 1:
+            for index, item in enumerate(items):
+                if index == len(items):
+                    return
+                else:
+                    pyautogui.typewrite(item, interval=DELAY)
+                    keyboard.press("tab")
+        else:
+            pyautogui.typewrite(items[0], interval=DELAY)
+    else:
+        return
+
 def on_right_click(event):
    item = tree.identify_row(event.y)
    if item != "":
@@ -307,11 +334,19 @@ def on_right_click(event):
 
    if item:
       menu = tkinter.Menu(root, tearoff=0)
+      autotype_menu = tkinter.Menu(menu, tearoff=0)
       menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
       menu.add_command(label="Hide Password", command=lambda:refresh_treeview(tree))
+
+      autotype_menu.add_command(label="USERNAME & PASSWORD -> {USERNAME}{TAB}{PASSWORD}", command=lambda: autotype([get_data()[int(item_id)][2], get_data()[int(item_id)][3]]))
+      autotype_menu.add_command(label="USERNAME -> {USERNAME}", command=lambda: autotype([get_data()[int(item_id)][2]]))
+      autotype_menu.add_command(label="PASSWORD -> {PASSWORD}", command=lambda: autotype([get_data()[int(item_id)][3]]))
+      
+
+      menu.add_cascade(label="Auto Type", menu=autotype_menu)
       menu.tk_popup(event.x_root, event.y_root)
 
 def combobox_callback(choice):
