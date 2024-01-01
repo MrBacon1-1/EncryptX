@@ -22,7 +22,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.6a"
+version = "v1.0.7a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -134,8 +134,6 @@ def get_data():
    for ind, x in enumerate(ready_data):
       x.insert(0, ind) 
 
-   del split_data, data
-
    return ready_data
 
 def add_password(url_or_program, user, password):
@@ -145,8 +143,6 @@ def add_password(url_or_program, user, password):
    encrypted_password = (crypto_handler.encryption(key, password)).encode("utf-8")
    encrypted_username = (crypto_handler.encryption(key, user)).encode("utf-8")
    encrypted_url_or_program = (crypto_handler.encryption(key, url_or_program)).encode("utf-8")
-
-   del password, url_or_program, user
 
    with open("Passwords.encryptx", "ab") as p:
       p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
@@ -166,8 +162,7 @@ def remove_password(index):
 
       ready_data = get_data()
       for line in ready_data:
-         tree.insert("", "end", values=(line)) 
-      del ready_data
+         tree.insert("", "end", values=(line))
    except:
       pass
       
@@ -208,8 +203,6 @@ def password_rating_check(password):
    if len(password) >= 8:
       score +=1
 
-   del password
-
    return score
 
 def password_generator(length: int, special: bool):
@@ -230,7 +223,6 @@ def refresh_stats(total_passwords):
    global total_passwords_value
    total_passwords_value = len(ready_data)
    total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
-   del ready_data
 
 def refresh_treeview(tree):
    for item in tree.get_children():
@@ -245,12 +237,12 @@ def refresh_treeview(tree):
       tree.insert("", "end", values=modified_line)
 
 def add_password_gui(root, tree):
-   info_window = customtkinter.CTkToplevel(root)
-   info_window.geometry("400x200")
-   info_window.title("Add Password")
-   name_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Name/URL")
-   username_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Username")
-   password_text_box = customtkinter.CTkEntry(info_window, placeholder_text="Password", show="*")
+   add_password_window = customtkinter.CTkToplevel(root)
+   add_password_window.geometry("400x200")
+   add_password_window.title("Add Password")
+   name_text_box = customtkinter.CTkEntry(add_password_window, placeholder_text="Name/URL")
+   username_text_box = customtkinter.CTkEntry(add_password_window, placeholder_text="Username")
+   password_text_box = customtkinter.CTkEntry(add_password_window, placeholder_text="Password", show="*")
    name_text_box.pack(padx=10, pady=10)
    username_text_box.pack(padx=10, pady=10)
    password_text_box.pack(padx=10, pady=10)
@@ -263,11 +255,9 @@ def add_password_gui(root, tree):
       add_password(name, username, password)
       refresh_treeview(tree)
 
-      del password, name, username
+      add_password_window.destroy()
 
-      info_window.destroy()
-
-   save_button = tkinter.Button(info_window, text="Add Password", command=lambda: send_info(tree))
+   save_button = tkinter.Button(add_password_window, text="Add Password", command=lambda: send_info(tree))
    save_button.pack(pady=5)
 
 def copy_user_or_pass(itemid, copy):
@@ -277,11 +267,9 @@ def copy_user_or_pass(itemid, copy):
    if copy == "user":
       user = data[2]
       pyperclip.copy(user)
-      del user, ready_data
    elif copy == "pass":
       password = data[3]
       pyperclip.copy(password)
-      del password, ready_data
    else:
       pass
 
@@ -301,8 +289,6 @@ def show_password(tree, item):
          modified_line = tuple(modified_line)
 
          tree.insert("", "end", values=modified_line)
-      
-   del data, modified_line, line, ready_data
 
 def autotype(items):
    msg = CTkMessagebox(title="Autotype", message=f"Auto Type In Previous Window?",
@@ -478,6 +464,12 @@ def main_gui():
 
    # Settings Page
 
+   settings_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Settings", font=("Cascadia Code", 28))
+   settings_title.pack(pady=(10,5), padx=5)
+
+   appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 18))
+   appearance_title.pack(pady=(10,5), padx=5)
+
    combobox_var = customtkinter.StringVar(value="Dark Mode")
    combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16) ,command=combobox_callback, variable=combobox_var)
    combobox_var.set("Dark Mode")
@@ -500,7 +492,6 @@ def login_check(master_pass):
    if decrypted_password != None:
       if decrypted_password.decode("utf-8") == master_pass:
          login.destroy()
-         del master_pass, decrypted_password
          main_gui()
       else:
          login.destroy()
@@ -523,8 +514,6 @@ def login_create(master_pass, second_entry):
    with open("UserData.encryptx", "w") as w:
       w.write(encrypted_password)
       w.close()
-
-   del master_pass
 
    login.destroy()
    main_gui()
