@@ -1,28 +1,28 @@
 #----------------------------------Modules----------------------------------#
 
-import os
-import time
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import padding, hashes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-import keyboard
-import pyperclip
-import random
 import base64
-import tkinter
-from tkinter import ttk
-import customtkinter
 import ctypes
 import gc
+import os
+import random
 import sys
-from CTkMessagebox import CTkMessagebox
-import pyautogui
+import time
+import tkinter
+from tkinter import ttk
+
+import customtkinter
 import keyboard
+import pyautogui
+import pyperclip
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.5a"
+version = "v1.0.6a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -308,20 +308,18 @@ def autotype(items):
    msg = CTkMessagebox(title="Autotype", message=f"Auto Type In Previous Window?",
                         icon="question", option_1="No", option_2="Yes", width=300, height=100)
    response = msg.get()
+
    if response=="Yes":
       keyboard.press_and_release("alt+tab")
+
       time.sleep(1)
+
       if len(items) > 1:
-            for index, item in enumerate(items):
-               if index == len(items):
-                  return
-               else:
-                  pyautogui.typewrite(item, interval=0.05)
-                  keyboard.press("tab")
+         pyautogui.typewrite(items[0], interval=0.01)
+         keyboard.press("tab")
+         pyautogui.typewrite(items[1], interval=0.01)
       else:
-         pyautogui.typewrite(items[0], interval=0.05)
-   else:
-      return
+         pyautogui.typewrite(items[0], interval=0.01)
 
 def on_right_click(event):
    item = tree.identify_row(event.y)
