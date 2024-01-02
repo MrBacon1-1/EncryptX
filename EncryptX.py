@@ -22,7 +22,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.8a"
+version = "v1.0.9a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -359,9 +359,17 @@ def combobox_callback(choice):
 
 def combobox_callback(choice):
    if choice == "Dark Mode":
+      style = ttk.Style(root)
+      style.theme_use("clam")
+      style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
       customtkinter.set_appearance_mode("dark")
+
    elif choice == "Light Mode":
+      style = ttk.Style(root)
+      style.theme_use("clam")
+      style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
+
    else:
       pass
 
@@ -491,10 +499,10 @@ def main_gui():
    appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 18))
    appearance_title.pack(pady=(10,5), padx=5)
 
-   combobox_var = customtkinter.StringVar(value="Dark Mode")
-   combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16) ,command=combobox_callback, variable=combobox_var)
-   combobox_var.set("Dark Mode")
-   combobox.pack(pady=(10,5), padx=5)
+   theme_var = customtkinter.StringVar(value="Dark Mode")
+   theme = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16), command=combobox_callback, variable=theme_var)
+   theme_var.set("Dark Mode")
+   theme.pack(pady=(10,5), padx=5)
 
    security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 18))
    security_title.pack(pady=(10,5), padx=5)
