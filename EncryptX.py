@@ -22,7 +22,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.7a"
+version = "v1.0.8a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -63,6 +63,7 @@ class CryptoHandler():
 
       except Exception as e:
          print("\nError Encrypting! " + str(e))
+         os._exit(0)
 
    def decryption (self, key, ciphertext_encoded):
       try:
@@ -82,6 +83,7 @@ class CryptoHandler():
 
       except Exception as e:
          print("\nError Decrypting! " + str(e))
+         os._exit(0)
 
 # Keybinds #
 
@@ -92,21 +94,11 @@ def lock_bind():
       pass
 
    gc.collect()
-
    os.execl(sys.executable, sys.executable, *sys.argv)
 
 def exit_bind():
-   try:
-      root.destroy()
-   except:
-      pass
-   try:
-      login.destroy()
-   except:
-      pass
-
    gc.collect()
-   sys.exit(0)
+   os._exit(0)
 
 # Password Related #
 
@@ -259,6 +251,35 @@ def add_password_gui(root, tree):
 
    save_button = tkinter.Button(add_password_window, text="Add Password", command=lambda: send_info(tree))
    save_button.pack(pady=5)
+
+def change_master_password_gui():
+   change_password_gui = customtkinter.CTkToplevel(root)
+   change_password_gui.geometry("400x200")
+   change_password_gui.title("Change Master Password")
+   original_password_box = customtkinter.CTkEntry(change_password_gui, placeholder_text="Original Password", show="*")
+   new_password_box = customtkinter.CTkEntry(change_password_gui, placeholder_text="New Password", show="*")
+   new_password_box2 = customtkinter.CTkEntry(change_password_gui, placeholder_text="Re-Type New Password", show="*")
+   original_password_box.pack(padx=10, pady=10)
+   new_password_box.pack(padx=10, pady=10)
+   new_password_box2.pack(padx=10, pady=10)
+
+   def change_master_password(org_pass, new_pass1, new_pass2):
+      if new_pass1 == new_pass2:
+         if login_check_function(org_pass):
+            passwords = get_data()
+
+            os.remove("Passwords.encryptx")
+            os.remove("UserData.encryptx")
+
+            login_create_function(new_pass1, new_pass2)
+
+            for item in passwords:
+               add_password(item[1], item[2], item[3])
+
+            change_password_gui.destroy()
+
+   change_button = tkinter.Button(change_password_gui, text="Change Master Password", command=lambda: change_master_password(original_password_box.get(), new_password_box.get(), new_password_box2.get()))
+   change_button.pack(pady=5)
 
 def copy_user_or_pass(itemid, copy):
    ready_data = get_data()
@@ -475,11 +496,17 @@ def main_gui():
    combobox_var.set("Dark Mode")
    combobox.pack(pady=(10,5), padx=5)
 
+   security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 18))
+   security_title.pack(pady=(10,5), padx=5)
+
+   change_password_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Change Password", font=("Cascadia Code", 16), command=lambda: change_master_password_gui())
+   change_password_button.pack(pady=(10,5), padx=5)
+
    root.mainloop()  
 
 #----------------------------------Login Functions----------------------------------#
 
-def login_check(master_pass):
+def login_check_function(master_pass):
    global key
 
    key = crypto_handler.generate_key(master_pass)
@@ -491,21 +518,15 @@ def login_check(master_pass):
    decrypted_password = crypto_handler.decryption(key, userdata)
    if decrypted_password != None:
       if decrypted_password.decode("utf-8") == master_pass:
-         login.destroy()
-         main_gui()
+         return True
       else:
-         login.destroy()
-         exit()
-
-   login.destroy()
-   exit()
+         return False
              
-def login_create(master_pass, second_entry):
+def login_create_function(master_pass, second_entry):
    global key
 
    if master_pass != second_entry:
-      login.destroy()
-      exit()
+      return False
 
    key = crypto_handler.generate_key(master_pass)
    encoded_password = bytes(master_pass, "utf-8")
@@ -515,8 +536,21 @@ def login_create(master_pass, second_entry):
       w.write(encrypted_password)
       w.close()
 
-   login.destroy()
-   main_gui()
+   return True
+
+def login_check(master_pass):
+   if login_check_function(master_pass):
+      login.destroy()
+      main_gui()
+
+   os._exit(0)
+
+def login_create(master_pass, second_entry):
+   if login_create_function(master_pass, second_entry):
+      login.destroy()
+      main_gui()
+
+   os._exit(0)
 
 def login_creation_gui():
    global login
