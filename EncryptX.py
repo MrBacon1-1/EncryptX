@@ -22,7 +22,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.0.9a"
+version = "v1.1.0a"
 SW_HIDE = 0
 SW_SHOW = 5
 
@@ -291,8 +291,6 @@ def copy_user_or_pass(itemid, copy):
    elif copy == "pass":
       password = data[3]
       pyperclip.copy(password)
-   else:
-      pass
 
 def show_password(tree, item):
    ready_data = get_data()
@@ -351,25 +349,15 @@ def on_right_click(event):
 
 def combobox_callback(choice):
    if choice == "Dark Mode":
-      customtkinter.set_appearance_mode("dark")
-   elif choice == "Light Mode":
-      customtkinter.set_appearance_mode("light")
-   else:
-      pass
-
-def combobox_callback(choice):
-   if choice == "Dark Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
       customtkinter.set_appearance_mode("dark")
-
    elif choice == "Light Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
-
    else:
       pass
 
@@ -568,15 +556,15 @@ def login_creation_gui():
       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
-   login.geometry("400x300")
+   login.geometry("375x250")
    login.resizable(width=0, height=0)
    login.title(f"EncryptX {version} ~ Account Creation")
 
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 32))
    title.pack(pady=20, padx=5)
 
-   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*")
-   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*")
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*", width=250)
+   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*", width=250)
    password_box.pack(pady=5, padx=5)
    second_password_box.pack(pady=5, padx=5)
 
@@ -593,14 +581,14 @@ def login_gui():
       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
-   login.geometry("400x300")
+   login.geometry("375x200")
    login.resizable(width=0, height=0)
    login.title(f"EncryptX {version} ~ Account Login")
 
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 22))
    title.pack(pady=20, padx=5)
 
-   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*")
+   password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*", width=250)
    password_box.pack(pady=5, padx=5)
 
    button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda:login_check(password_box.get()))
@@ -613,9 +601,9 @@ def login_gui():
 def boot():
    global crypto_handler
 
-   keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
-
    crypto_handler = CryptoHandler()
+
+   keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
    customtkinter.set_appearance_mode("dark")
 
