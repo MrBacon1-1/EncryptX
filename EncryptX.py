@@ -7,6 +7,7 @@ import os
 import random
 import sys
 import time
+import threading
 import tkinter
 from tkinter import ttk
 
@@ -22,9 +23,10 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.0a"
+version = "v1.1.1a"
 SW_HIDE = 0
 SW_SHOW = 5
+counting_thread = None
 
 #----------------------------------Functions----------------------------------#
 
@@ -281,7 +283,24 @@ def change_master_password_gui():
    change_button = tkinter.Button(change_password_gui, text="Change Master Password", command=lambda: change_master_password(original_password_box.get(), new_password_box.get(), new_password_box2.get()))
    change_button.pack(pady=5)
 
+class CountThread(threading.Thread):
+   def __init__(self):
+      super(CountThread, self).__init__()
+      self.counting = True
+
+   def run(self):
+      count = duration
+      while self.counting and count > 0:
+         count -= 1
+         time.sleep(1)
+
+      if count == 0:
+         ctypes.windll.user32.OpenClipboard(0)
+         ctypes.windll.user32.EmptyClipboard()
+         ctypes.windll.user32.CloseClipboard()
+
 def copy_user_or_pass(itemid, copy):
+   global counting_thread
    ready_data = get_data()
    data = ready_data[int(itemid)]
 
@@ -291,6 +310,16 @@ def copy_user_or_pass(itemid, copy):
    elif copy == "pass":
       password = data[3]
       pyperclip.copy(password)
+
+   if duration != -1:
+      if counting_thread is None or not counting_thread.is_alive():
+         counting_thread = CountThread()
+         counting_thread.start()
+      else:
+         counting_thread.counting = False
+         counting_thread.join()
+         counting_thread = CountThread()
+         counting_thread.start()
 
 def show_password(tree, item):
    ready_data = get_data()
@@ -348,6 +377,9 @@ def on_right_click(event):
       menu.tk_popup(event.x_root, event.y_root)
 
 def combobox_callback(choice):
+
+   # Theme Stuff
+
    if choice == "Dark Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
@@ -358,8 +390,19 @@ def combobox_callback(choice):
       style.theme_use("clam")
       style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
+
+   # Clipboard Clear Stuff
+      
+   global duration
+
+   if choice == "Dont Clear":
+      duration = -1
    else:
-      pass
+      try:
+         duration = int(choice)
+      except:
+         pass
+
 
 def slider_event(value):
    global password_generated
@@ -497,6 +540,14 @@ def main_gui():
 
    change_password_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Change Password", font=("Cascadia Code", 16), command=lambda: change_master_password_gui())
    change_password_button.pack(pady=(10,5), padx=5)
+
+   global duration
+   duration = 15
+
+   duration_var = customtkinter.StringVar(value="15")
+   duration_combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dont Clear", "10", "15", "20", "25", "30", "60"], font=("Cascadia Code", 16), command=combobox_callback, variable=duration_var)
+   duration_var.set("15")
+   duration_combobox.pack(pady=(10,5), padx=5)
 
    root.mainloop()  
 
