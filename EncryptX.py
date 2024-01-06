@@ -23,7 +23,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.1a"
+version = "v1.1.2a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -527,7 +527,7 @@ def main_gui():
    settings_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Settings", font=("Cascadia Code", 28))
    settings_title.pack(pady=(10,5), padx=5)
 
-   appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 18))
+   appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 20))
    appearance_title.pack(pady=(10,5), padx=5)
 
    theme_var = customtkinter.StringVar(value="Dark Mode")
@@ -535,11 +535,14 @@ def main_gui():
    theme_var.set("Dark Mode")
    theme.pack(pady=(10,5), padx=5)
 
-   security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 18))
+   security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 20))
    security_title.pack(pady=(10,5), padx=5)
 
    change_password_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Change Password", font=("Cascadia Code", 16), command=lambda: change_master_password_gui())
    change_password_button.pack(pady=(10,5), padx=5)
+
+   duration_label = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Clear Password Duration", font=("Cascadia Code", 16))
+   duration_label.pack(pady=(10,5), padx=5)
 
    global duration
    duration = 15
