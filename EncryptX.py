@@ -7,6 +7,7 @@ import os
 import random
 import sys
 import time
+import json
 import threading
 import tkinter
 from tkinter import ttk
@@ -23,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.2a"
+version = "v1.1.3a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -212,6 +213,10 @@ def password_generator(length: int, special: bool):
 
 #----------------------------------Main GUI----------------------------------#
 
+def save_settings():
+   with open("settings.json", "w") as s:
+      json.dump(settings, s, indent=4)
+
 def refresh_stats(total_passwords):
    ready_data = get_data()
    global total_passwords_value
@@ -385,11 +390,13 @@ def combobox_callback(choice):
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
       customtkinter.set_appearance_mode("dark")
+      settings["theme"] = "dark"
    elif choice == "Light Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
+      settings["theme"] = "light"
 
    # Clipboard Clear Stuff
       
@@ -397,11 +404,15 @@ def combobox_callback(choice):
 
    if choice == "Dont Clear":
       duration = -1
+      settings["clear_password_duration"] = "-1"
    else:
       try:
          duration = int(choice)
+         settings["clear_password_duration"] = choice
       except:
          pass
+
+   save_settings()
 
 
 def slider_event(value):
@@ -442,9 +453,17 @@ def main_gui():
    except:
       pass  
 
-   style = ttk.Style(root)
-   style.theme_use("clam")
-   style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
+   if settings["theme"] == "dark":
+      customtkinter.set_appearance_mode("dark")
+      style = ttk.Style(root)
+      style.theme_use("clam")
+      style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
+   elif settings["theme"] == "light":
+      customtkinter.set_appearance_mode("light")
+      style = ttk.Style(root)
+      style.theme_use("clam")
+      style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
+
    tree = ttk.Treeview(master=tabview.tab("Passwords"), columns=("ID", "Name/URL", "Username", "Password", "Password_Rating"), show="headings", style="Treeview")
 
    scrollbar = tkinter.ttk.Scrollbar(tree, orient=tkinter.VERTICAL, command=tree.yview)
@@ -530,9 +549,9 @@ def main_gui():
    appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 20))
    appearance_title.pack(pady=(10,5), padx=5)
 
-   theme_var = customtkinter.StringVar(value="Dark Mode")
+   theme_var = customtkinter.StringVar(value=settings["theme"])
    theme = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16), command=combobox_callback, variable=theme_var)
-   theme_var.set("Dark Mode")
+   theme_var.set(settings["theme"])
    theme.pack(pady=(10,5), padx=5)
 
    security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 20))
@@ -545,11 +564,11 @@ def main_gui():
    duration_label.pack(pady=(10,5), padx=5)
 
    global duration
-   duration = 15
+   duration = int(settings["clear_password_duration"])
 
-   duration_var = customtkinter.StringVar(value="15")
+   duration_var = customtkinter.StringVar(value=settings["clear_password_duration"])
    duration_combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dont Clear", "10", "15", "20", "25", "30", "60"], font=("Cascadia Code", 16), command=combobox_callback, variable=duration_var)
-   duration_var.set("15")
+   duration_var.set(settings["clear_password_duration"])
    duration_combobox.pack(pady=(10,5), padx=5)
 
    root.mainloop()  
@@ -653,13 +672,28 @@ def login_gui():
 #----------------------------------Boot----------------------------------#
 
 def boot():
-   global crypto_handler
+   global crypto_handler, settings
 
    crypto_handler = CryptoHandler()
 
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
-   customtkinter.set_appearance_mode("dark")
+   settings = {
+      "theme": "dark",
+      "clear_password_duration": "15"
+   }
+
+   if not os.path.exists("settings.json"):
+      with open("settings.json", "w") as s:
+         json.dump(settings, s, indent=4)
+   else:
+      with open('settings.json', 'r') as s:
+         settings = json.load(s)
+
+   if settings["theme"] == "dark":
+      customtkinter.set_appearance_mode("dark")
+   elif settings["theme"] == "light":
+      customtkinter.set_appearance_mode("light")
 
    if os.path.exists("UserData.encryptx"):
       new_user = False
