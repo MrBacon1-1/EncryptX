@@ -24,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.3a"
+version = "v1.1.4a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -213,9 +213,9 @@ def password_generator(length: int, special: bool):
 
 #----------------------------------Main GUI----------------------------------#
 
-def save_settings():
-   with open("settings.json", "w") as s:
-      json.dump(settings, s, indent=4)
+def save_data():
+   with open("userData.json", "w") as s:
+      json.dump(userdata, s, indent=4)
 
 def refresh_stats(total_passwords):
    ready_data = get_data()
@@ -390,13 +390,13 @@ def combobox_callback(choice):
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
       customtkinter.set_appearance_mode("dark")
-      settings["theme"] = "dark"
+      userdata["settings"]["theme"] = "dark"
    elif choice == "Light Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
-      settings["theme"] = "light"
+      userdata["settings"]["theme"] = "light"
 
    # Clipboard Clear Stuff
       
@@ -404,15 +404,15 @@ def combobox_callback(choice):
 
    if choice == "Dont Clear":
       duration = -1
-      settings["clear_password_duration"] = "-1"
+      userdata["settings"]["clear_password_duration"] = "-1"
    else:
       try:
          duration = int(choice)
-         settings["clear_password_duration"] = choice
+         userdata["settings"]["clear_password_duration"] = choice
       except:
          pass
 
-   save_settings()
+   save_data()
 
 
 def slider_event(value):
@@ -453,12 +453,12 @@ def main_gui():
    except:
       pass  
 
-   if settings["theme"] == "dark":
+   if userdata["settings"]["theme"] == "dark":
       customtkinter.set_appearance_mode("dark")
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
-   elif settings["theme"] == "light":
+   elif userdata["settings"]["theme"] == "light":
       customtkinter.set_appearance_mode("light")
       style = ttk.Style(root)
       style.theme_use("clam")
@@ -549,9 +549,9 @@ def main_gui():
    appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 20))
    appearance_title.pack(pady=(10,5), padx=5)
 
-   theme_var = customtkinter.StringVar(value=settings["theme"])
+   theme_var = customtkinter.StringVar(value=userdata["settings"]["theme"])
    theme = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16), command=combobox_callback, variable=theme_var)
-   theme_var.set(settings["theme"])
+   theme_var.set(userdata["settings"]["theme"])
    theme.pack(pady=(10,5), padx=5)
 
    security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 20))
@@ -564,11 +564,11 @@ def main_gui():
    duration_label.pack(pady=(10,5), padx=5)
 
    global duration
-   duration = int(settings["clear_password_duration"])
+   duration = int(userdata["settings"]["clear_password_duration"])
 
-   duration_var = customtkinter.StringVar(value=settings["clear_password_duration"])
+   duration_var = customtkinter.StringVar(value=userdata["settings"]["clear_password_duration"])
    duration_combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dont Clear", "10", "15", "20", "25", "30", "60"], font=("Cascadia Code", 16), command=combobox_callback, variable=duration_var)
-   duration_var.set(settings["clear_password_duration"])
+   duration_var.set(userdata["settings"]["clear_password_duration"])
    duration_combobox.pack(pady=(10,5), padx=5)
 
    root.mainloop()  
@@ -580,11 +580,7 @@ def login_check_function(master_pass):
 
    key = crypto_handler.generate_key(master_pass)
 
-   with open("UserData.encryptx", "r") as r:
-      userdata = r.read()
-      r.close()
-
-   decrypted_password = crypto_handler.decryption(key, userdata)
+   decrypted_password = crypto_handler.decryption(key, userdata["masterpass"]["password"])
    if decrypted_password != None:
       if decrypted_password.decode("utf-8") == master_pass:
          return True
@@ -601,9 +597,8 @@ def login_create_function(master_pass, second_entry):
    encoded_password = bytes(master_pass, "utf-8")
    encrypted_password = crypto_handler.encryption(key, encoded_password)
 
-   with open("UserData.encryptx", "w") as w:
-      w.write(encrypted_password)
-      w.close()
+   userdata["masterpass"]["password"] = encrypted_password
+   save_data()
 
    return True
 
@@ -624,9 +619,9 @@ def login_create(master_pass, second_entry):
 def login_creation_gui():
    global login
 
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   # if hwnd:
+   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("375x250")
@@ -649,9 +644,9 @@ def login_creation_gui():
 def login_gui():
    global login
 
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   # if hwnd:
+   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("375x200")
@@ -672,30 +667,35 @@ def login_gui():
 #----------------------------------Boot----------------------------------#
 
 def boot():
-   global crypto_handler, settings
+   global crypto_handler, userdata
 
    crypto_handler = CryptoHandler()
 
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
-   settings = {
-      "theme": "dark",
-      "clear_password_duration": "15"
+   userdata = {
+      "masterpass": {
+         "password": ""
+      },
+      "settings": {
+         "theme": "dark",
+         "clear_password_duration": "15"
+      }
    }
 
-   if not os.path.exists("settings.json"):
-      with open("settings.json", "w") as s:
-         json.dump(settings, s, indent=4)
+   if not os.path.exists("userData.json"):
+      with open("userData.json", "w") as s:
+         json.dump(userdata, s, indent=4)
    else:
-      with open('settings.json', 'r') as s:
-         settings = json.load(s)
+      with open('userData.json', 'r') as s:
+         userdata = json.load(s)
 
-   if settings["theme"] == "dark":
+   if userdata["settings"]["theme"] == "dark":
       customtkinter.set_appearance_mode("dark")
-   elif settings["theme"] == "light":
+   elif userdata["settings"]["theme"] == "light":
       customtkinter.set_appearance_mode("light")
 
-   if os.path.exists("UserData.encryptx"):
+   if os.path.exists("userData.json") and userdata["masterpass"]["password"] != "":
       new_user = False
    else:
       new_user = True
