@@ -24,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.4a"
+version = "v1.1.5a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -160,6 +160,8 @@ def remove_password(index):
          tree.insert("", "end", values=(line))
    except:
       pass
+
+   refresh_stats()
       
 def password_rating_check(password):
    score = 0
@@ -253,6 +255,7 @@ def add_password_gui(root, tree):
 
       add_password(name, username, password)
       refresh_treeview(tree)
+      refresh_stats()
 
       add_password_window.destroy()
 
@@ -390,13 +393,13 @@ def combobox_callback(choice):
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
       customtkinter.set_appearance_mode("dark")
-      userdata["settings"]["theme"] = "dark"
+      userdata["settings"]["theme"] = "Dark Mode"
    elif choice == "Light Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
-      userdata["settings"]["theme"] = "light"
+      userdata["settings"]["theme"] = "Light Mode"
 
    # Clipboard Clear Stuff
       
@@ -453,12 +456,12 @@ def main_gui():
    except:
       pass  
 
-   if userdata["settings"]["theme"] == "dark":
+   if userdata["settings"]["theme"] == "Dark Mode":
       customtkinter.set_appearance_mode("dark")
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
-   elif userdata["settings"]["theme"] == "light":
+   elif userdata["settings"]["theme"] == "Light Mode":
       customtkinter.set_appearance_mode("light")
       style = ttk.Style(root)
       style.theme_use("clam")
@@ -538,9 +541,6 @@ def main_gui():
    total_passwords_label = customtkinter.CTkLabel(master=tabview.tab("Stats"), text=("Passwords Saved ~> ", total_passwords_value), font=("Cascadia Code", 12))
    total_passwords_label.pack(pady=(10,5), padx=5)
 
-   refresh_button_stats = customtkinter.CTkButton(master=tabview.tab("Stats"), text="Refresh Stats", font=("Cascadia Code", 12), command=lambda: refresh_stats(total_passwords_label))
-   refresh_button_stats.pack() 
-
    # Settings Page
 
    settings_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Settings", font=("Cascadia Code", 28))
@@ -619,9 +619,9 @@ def login_create(master_pass, second_entry):
 def login_creation_gui():
    global login
 
-   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   # if hwnd:
-   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("375x250")
@@ -644,9 +644,9 @@ def login_creation_gui():
 def login_gui():
    global login
 
-   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   # if hwnd:
-   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    login = customtkinter.CTk()
    login.geometry("375x200")
@@ -678,7 +678,7 @@ def boot():
          "password": ""
       },
       "settings": {
-         "theme": "dark",
+         "theme": "Dark Mode",
          "clear_password_duration": "15"
       }
    }
@@ -690,9 +690,9 @@ def boot():
       with open('userData.json', 'r') as s:
          userdata = json.load(s)
 
-   if userdata["settings"]["theme"] == "dark":
+   if userdata["settings"]["theme"] == "Dark Mode":
       customtkinter.set_appearance_mode("dark")
-   elif userdata["settings"]["theme"] == "light":
+   elif userdata["settings"]["theme"] == "Light Mode":
       customtkinter.set_appearance_mode("light")
 
    if os.path.exists("userData.json") and userdata["masterpass"]["password"] != "":
