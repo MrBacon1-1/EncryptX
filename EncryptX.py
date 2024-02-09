@@ -24,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.5a"
+version = "v1.1.6a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -151,16 +151,7 @@ def remove_password(index):
          if index_of_line != int(index):
             write.write(line)
 
-   try:
-      for item in tree.get_children():
-         tree.delete(item)
-
-      ready_data = get_data()
-      for line in ready_data:
-         tree.insert("", "end", values=(line))
-   except:
-      pass
-
+   refresh_treeview()
    refresh_stats()
       
 def password_rating_check(password):
@@ -219,13 +210,13 @@ def save_data():
    with open("userData.json", "w") as s:
       json.dump(userdata, s, indent=4)
 
-def refresh_stats(total_passwords):
+def refresh_stats():
    ready_data = get_data()
    global total_passwords_value
    total_passwords_value = len(ready_data)
-   total_passwords.configure(text=("Passwords Saved ~> ", total_passwords_value))
+   total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords_value))
 
-def refresh_treeview(tree):
+def refresh_treeview():
    for item in tree.get_children():
       tree.delete(item)
 
@@ -254,7 +245,7 @@ def add_password_gui(root, tree):
       password = password_text_box.get()
 
       add_password(name, username, password)
-      refresh_treeview(tree)
+      refresh_treeview()
       refresh_stats()
 
       add_password_window.destroy()
@@ -279,7 +270,6 @@ def change_master_password_gui():
             passwords = get_data()
 
             os.remove("Passwords.encryptx")
-            os.remove("UserData.encryptx")
 
             login_create_function(new_pass1, new_pass2)
 
@@ -375,7 +365,7 @@ def on_right_click(event):
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
-      menu.add_command(label="Hide Password", command=lambda:refresh_treeview(tree))
+      menu.add_command(label="Hide Password", command=lambda:refresh_treeview())
 
       autotype_menu.add_command(label="Username & Password", command=lambda: autotype([get_data()[int(item_id)][2], get_data()[int(item_id)][3]]))
       autotype_menu.add_command(label="Username", command=lambda: autotype([get_data()[int(item_id)][2]]))
@@ -444,6 +434,7 @@ def main_gui():
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
    tabview.add("Passwords")
+   tabview.add("Crypto Tool")
    tabview.add("Password Generator") 
    tabview.add("Binds")
    tabview.add("Stats")
@@ -478,7 +469,7 @@ def main_gui():
    tree.heading("Password", text="Password")
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
-   refresh_treeview(tree)
+   refresh_treeview()
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
@@ -493,8 +484,13 @@ def main_gui():
    add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview(tree))
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview())
    refresh_button.pack() 
+
+   # Cryptography Tool
+
+   crypto_tool_label = customtkinter.CTkLabel(master=tabview.tab("Crypto Tool"), text="Cryptography Tool", font=("Cascadia Code", 18))
+   crypto_tool_label.pack(pady=(20,5), padx=5)
 
    # Password Generator
 
@@ -537,6 +533,7 @@ def main_gui():
    title_stats = customtkinter.CTkLabel(master=tabview.tab("Stats"), text="EncryptX Stats", font=("Cascadia Code", 22))
    title_stats.pack(pady=15, padx=10)
 
+   global total_passwords_label
    total_passwords_value = len(ready_data)
    total_passwords_label = customtkinter.CTkLabel(master=tabview.tab("Stats"), text=("Passwords Saved ~> ", total_passwords_value), font=("Cascadia Code", 12))
    total_passwords_label.pack(pady=(10,5), padx=5)
