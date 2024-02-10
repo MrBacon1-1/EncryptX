@@ -23,14 +23,8 @@
 # Contents
 
 1. [Features](#features)
-2. [Arguments](#arguments)
+2. [Requirements](#requirements)
 3. [Donate](#donate)
-
-# Contents
-
-1. [Requirements](#requirements)
-2. [Arguments](#arguments)
-3. [Usage Examples](#usage) 
 
 # Features
   
