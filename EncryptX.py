@@ -24,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.6a"
+version = "v1.1.7a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -66,7 +66,6 @@ class CryptoHandler():
 
       except Exception as e:
          print("\nError Encrypting! " + str(e))
-         os._exit(0)
 
    def decryption (self, key, ciphertext_encoded):
       try:
@@ -86,7 +85,6 @@ class CryptoHandler():
 
       except Exception as e:
          print("\nError Decrypting! " + str(e))
-         os._exit(0)
 
 # Keybinds #
 
@@ -407,6 +405,61 @@ def combobox_callback(choice):
 
    save_data()
 
+def encrypt(entered_key):
+   generated_key = crypto_handler.generate_key(entered_key)
+   path = tkinter.filedialog.askopenfilename()
+
+   if len(path) == 0:
+      return
+   
+   if path.endswith('.encryptx'):
+      return
+   
+   with open(path, "rb") as f:
+      lines = f.readlines()
+      f.close
+
+   with open(path, "wb") as f:
+      f.write(b"")
+      f.close
+
+   with open(path, "ab") as f:
+      for line in lines:
+         encrypted_line = crypto_handler.encryption(generated_key, line)
+         f.write(encrypted_line.encode() + b"\n")
+
+   os.rename(path, (path + ".encryptx"))
+
+def decrypt(entered_key):
+   generated_key = crypto_handler.generate_key(entered_key)
+   path = tkinter.filedialog.askopenfilename()
+
+   if len(path) == 0:
+      return
+   
+   if not path.endswith('.encryptx'):
+      return
+   
+   with open(path, "rb") as f:
+      lines = f.readlines()
+      f.close
+
+   with open(path, "wb") as f:
+      f.write(b"")
+      f.close
+
+   with open(path, "ab") as f:
+      fail = False
+      for line in lines:
+         try:
+            decrypted_line = crypto_handler.decryption(generated_key, line)
+            f.write(decrypted_line)
+         except:
+            f.write(line)
+            fail = True
+
+   if not fail:
+      os.rename(path, path[:-len(".encryptx")])
 
 def slider_event(value):
    global password_generated
@@ -484,13 +537,22 @@ def main_gui():
    add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: refresh_treeview())
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=refresh_treeview)
    refresh_button.pack() 
 
    # Cryptography Tool
 
    crypto_tool_label = customtkinter.CTkLabel(master=tabview.tab("Crypto Tool"), text="Cryptography Tool", font=("Cascadia Code", 18))
    crypto_tool_label.pack(pady=(20,5), padx=5)
+
+   key_entry_box = customtkinter.CTkEntry(master=tabview.tab("Crypto Tool"), placeholder_text="Key", font=("Cascadia Code", 16))
+   key_entry_box.pack(pady=(20,5), padx=5)
+
+   encrypt_button = customtkinter.CTkButton(master=tabview.tab("Crypto Tool"), text="Encrypt File", font=("Cascadia Code", 16), command=lambda: encrypt(key_entry_box.get()))
+   encrypt_button.pack(pady=5, padx=5)
+
+   decrypt_button = customtkinter.CTkButton(master=tabview.tab("Crypto Tool"), text="Decrypt File", font=("Cascadia Code", 16), command=lambda: decrypt(key_entry_box.get()))
+   decrypt_button.pack(pady=5, padx=5)
 
    # Password Generator
 
@@ -554,7 +616,7 @@ def main_gui():
    security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 20))
    security_title.pack(pady=(10,5), padx=5)
 
-   change_password_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Change Password", font=("Cascadia Code", 16), command=lambda: change_master_password_gui())
+   change_password_button = customtkinter.CTkButton(master=tabview.tab("Settings"), text="Change Password", font=("Cascadia Code", 16), command=change_master_password_gui)
    change_password_button.pack(pady=(10,5), padx=5)
 
    duration_label = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Clear Password Duration", font=("Cascadia Code", 16))
