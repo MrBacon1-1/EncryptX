@@ -24,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.7a"
+version = "v1.1.8a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -666,14 +666,14 @@ def login_check(master_pass):
       login.destroy()
       main_gui()
 
-   os._exit(0)
+   CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
 def login_create(master_pass, second_entry):
    if login_create_function(master_pass, second_entry):
       login.destroy()
       main_gui()
 
-   os._exit(0)
+   CTkMessagebox(title="Error!", message="Mismatched Password!", icon="cancel")
 
 def login_creation_gui():
    global login
