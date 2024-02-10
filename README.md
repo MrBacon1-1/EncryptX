@@ -43,7 +43,7 @@ If you are not using a pre compiled exe you will need the following:
 
 Operating System: 64-bit Windows 10 or Windows 11
 
-Linux has not been tested.
+Linux & MacOS have not been tested.
 
 # Donate
 
