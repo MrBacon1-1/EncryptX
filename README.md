@@ -27,10 +27,6 @@
 3. [Donate](#donate)
 
 # Features
-  
-<h2 align="center">
-   Features
-</h2>
 
     • AES-256 Encryption
     • GUI Interface
