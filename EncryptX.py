@@ -65,7 +65,7 @@ class CryptoHandler():
          return encoded_text.decode("utf-8")
 
       except Exception as e:
-         print("\nError Encrypting! " + str(e))
+         print("Error Encrypting! " + str(e))
 
    def decryption (self, key, ciphertext_encoded):
       try:
@@ -84,7 +84,7 @@ class CryptoHandler():
          return decrypted
 
       except Exception as e:
-         print("\nError Decrypting! " + str(e))
+         print("Error Decrypting! " + str(e))
 
 # Keybinds #
 
