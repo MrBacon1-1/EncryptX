@@ -19,6 +19,14 @@
 <p align="center">
    I've developed a robust password manager in Python that utilizes AES encryption to ensure the secure storage of sensitive data. The main goal of this password manager is to provide users with a reliable and convenient solution for managing their passwords effectively.
 </p>
+
+# Contents
+
+1. [Features](#features)
+2. [Arguments](#arguments)
+3. [Donate](#donate)
+
+# Features
   
 <h2 align="center">
    Features
@@ -61,6 +69,8 @@ To run the password manager, you will need to ensure a few Python packages are i
 This command will automatically install the necessary dependencies, ensuring the password manager functions smoothly.
 Once everything is set up, open the Python file, and you will have access to the password manager's full range of features. Just like the exe version, you can securely store, view, and remove passwords.
 Please note that while our password manager is fully functional and capable of securely storing, viewing, and removing passwords, it is an ongoing project. We continuously work on improving and adding new features to make it even better. While the main features are already working flawlessly, there may still be some additional functionality we are actively developing.
+
+# Donate
 
 <h2 align="center">
    Support the Project!
