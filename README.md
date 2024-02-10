@@ -28,6 +28,8 @@
     • GUI Interface
     • Password Generator
     • Keybinds
+    • Encrypt & Decrypt Files
+    • Portable
 
 <h2 align="center">
    Why I used AES encrytion?
