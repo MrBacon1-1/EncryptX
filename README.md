@@ -41,6 +41,8 @@ If you are not using a pre compiled exe you will need the following:
 
 `pip install cryptography pyperclip keyboard customtkinter CTkMessagebox pyautogui`
 
+EncryptX has only been tested on Windows 10 but most likely works on windows 11
+
 # Donate
 
 <h2 align="center">
