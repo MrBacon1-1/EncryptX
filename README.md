@@ -26,6 +26,12 @@
 2. [Arguments](#arguments)
 3. [Donate](#donate)
 
+# Contents
+
+1. [Requirements](#requirements)
+2. [Arguments](#arguments)
+3. [Usage Examples](#usage) 
+
 # Features
   
 <h2 align="center">
@@ -39,36 +45,11 @@
     • Encrypt & Decrypt Files
     • Portable
 
-<h2 align="center">
-   Why I used AES encrytion?
-</h2>
+# Requirements
 
-I chose to implement AES (Advanced Encryption Standard) encryption for my password manager due to its widely recognized reputation for robust security and reliability. As a crucial aspect of any password management system, data protection is paramount to safeguarding sensitive information. AES encryption employs a symmetric key algorithm, ensuring that my passwords are securely encrypted and decrypted using the same key. This allows for efficient and fast encryption and decryption processes while maintaining a high level of security. Additionally, AES has undergone extensive scrutiny and testing by cryptographic experts worldwide, making it one of the most trustworthy encryption methods available.
-
-<h2 align="center">
-   How do I use the program?
-</h2>
-
-## Downloading the Exe File (Recommended):
-
-The most straightforward way to use our password manager is by downloading the pre-compiled executable (exe) file from our releases page. 
-Simply visit the releases page and find the latest version available for download.
-Once the download is complete, all you need to do is run the exe file.
-In case you encounter any issues or have suggestions for improvement, we encourage you to report them by opening an issue on our GitHub repository. 
-
-## Installing the Python Version (For Advanced Users):
-
-This option requires Python to be installed on your system.
-To begin, make sure you have Python installed on your computer. 
-If you don't have it yet, you can easily download and install it from the official [Python](https://www.python.org/) website.
-Once Python is ready, you can download the Python file from our GitHub repository.
-To run the password manager, you will need to ensure a few Python packages are installed. Execute the following command in your terminal or command prompt:
+If you are not using a pre compiled exe you will need the following:
 
 `pip install cryptography pyperclip keyboard customtkinter CTkMessagebox pyautogui`
-
-This command will automatically install the necessary dependencies, ensuring the password manager functions smoothly.
-Once everything is set up, open the Python file, and you will have access to the password manager's full range of features. Just like the exe version, you can securely store, view, and remove passwords.
-Please note that while our password manager is fully functional and capable of securely storing, viewing, and removing passwords, it is an ongoing project. We continuously work on improving and adding new features to make it even better. While the main features are already working flawlessly, there may still be some additional functionality we are actively developing.
 
 # Donate
 
