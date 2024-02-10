@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-   I've developed a robust password manager in Python that utilizes AES encryption to ensure the secure storage of sensitive data. The main goal of this password manager is to provide users with a reliable and convenient solution for managing their passwords effectively.
+   EncryptX is a portable password manager that keeps your passwords safe and easy to manage. With strong encryption, it ensures your information is secure while providing convenience in the digital world.
 </p>
 
 # Contents
