@@ -665,15 +665,15 @@ def login_check(master_pass):
    if login_check_function(master_pass):
       login.destroy()
       main_gui()
-
-   CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
+   else:
+      CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
 def login_create(master_pass, second_entry):
    if login_create_function(master_pass, second_entry):
       login.destroy()
       main_gui()
-
-   CTkMessagebox(title="Error!", message="Mismatched Password!", icon="cancel")
+   else:
+      CTkMessagebox(title="Error!", message="Mismatched Password!", icon="cancel")
 
 def login_creation_gui():
    global login
