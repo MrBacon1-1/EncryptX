@@ -24,7 +24,7 @@ from CTkMessagebox import CTkMessagebox
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.8a"
+version = "v1.1.9a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
