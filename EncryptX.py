@@ -1,92 +1,33 @@
 #----------------------------------Modules----------------------------------#
 
-import base64
 import ctypes
 import gc
 import os
-import random
 import sys
 import time
 import json
 import threading
 import tkinter
 from tkinter import ttk
-
 import customtkinter
 import keyboard
 import pyautogui
 import pyperclip
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, padding
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from CTkMessagebox import CTkMessagebox
+from Functions.CryptoHandler import CryptoHandler
+from Functions.PasswordManager import PasswordManager
+
+crypto_handler = CryptoHandler()
+password_manager = PasswordManager()
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.1.9a"
+version = "v1.2.0a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
 
-#----------------------------------Functions----------------------------------#
-
-class CryptoHandler():
-   def generate_key(self, password):
-
-      salt = b'~4\xb43\xf6.\xc16P\xc7C\x84\n\xc0\x9e\x96'
-
-      kdf = PBKDF2HMAC(
-         algorithm=hashes.SHA256(),
-         length=32,
-         salt=salt,
-         iterations=1000,
-         backend=default_backend()
-      )
-
-      key = kdf.derive(password.encode('utf-8'))
-
-      return key
-
-   def encryption(self, key, plaintext):
-      try:
-         iv = os.urandom(16)
-
-         padder = padding.PKCS7(algorithms.AES.block_size).padder()
-         plaintext_padded = padder.update(plaintext) + padder.finalize()
-
-         cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
-
-         encryptor = cipher.encryptor()
-         ciphertext = encryptor.update(plaintext_padded) + encryptor.finalize()
-
-         encoded_text = base64.b64encode(iv + ciphertext)
-
-         return encoded_text.decode("utf-8")
-
-      except Exception as e:
-         print("Error Encrypting! " + str(e))
-
-   def decryption (self, key, ciphertext_encoded):
-      try:
-         ciphertext = base64.b64decode(ciphertext_encoded)
-
-         iv = ciphertext[:16]
-
-         cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
-         decryptor = cipher.decryptor()
-
-         decrypted_padded = decryptor.update(ciphertext[16:]) + decryptor.finalize()
-
-         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
-         decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
-
-         return decrypted
-
-      except Exception as e:
-         print("Error Decrypting! " + str(e))
-
-# Keybinds #
+#----------------------------------Keybinds----------------------------------#
 
 def lock_bind():
    try:
@@ -101,107 +42,6 @@ def exit_bind():
    gc.collect()
    os._exit(0)
 
-# Password Related #
-
-def get_data():
-   ready_data = []
-
-   if os.path.isfile("Passwords.encryptx") != True:
-      with open("Passwords.encryptx", "w") as w:
-         w.close()
-      
-   with open("Passwords.encryptx", "rb") as read:
-      split_data = read.read().split(b"\n")
-      read.close()
-
-   for data in split_data:
-         if data:
-            url_or_program, user, password = data.split(b"04n$b3e0R5K*")
-            url_or_program, user, password = base64.b64decode(url_or_program), base64.b64decode(user), base64.b64decode(password)
-            url_or_program = crypto_handler.decryption(key, url_or_program).decode()
-            user = crypto_handler.decryption(key, user).decode()
-            password = crypto_handler.decryption(key, password).decode()
-            rating = password_rating_check(password)
-            ready_data.append([url_or_program, user, password, rating]) 
-
-   for ind, x in enumerate(ready_data):
-      x.insert(0, ind) 
-
-   return ready_data
-
-def add_password(url_or_program, user, password):
-   password = bytes(password, "utf-8")
-   user = bytes(user, "utf-8")
-   url_or_program = bytes(url_or_program, "utf-8")
-   encrypted_password = (crypto_handler.encryption(key, password)).encode("utf-8")
-   encrypted_username = (crypto_handler.encryption(key, user)).encode("utf-8")
-   encrypted_url_or_program = (crypto_handler.encryption(key, url_or_program)).encode("utf-8")
-
-   with open("Passwords.encryptx", "ab") as p:
-      p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")            
-       
-def remove_password(index):
-   with open("Passwords.encryptX", "rb") as read:
-      lines = read.readlines()
-      read.close()
-   with open("Passwords.encryptX", "wb") as write:
-      for index_of_line, line in enumerate(lines):
-         if index_of_line != int(index):
-            write.write(line)
-
-   refresh_treeview()
-   refresh_stats()
-      
-def password_rating_check(password):
-   score = 0
-   lowercase_characters_present = uppercase_characters_present = special_characters_present = numbers_present = False
-
-   lowercase_characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-   uppercase_characters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-   special_characters = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', '\\', ';', ':', "'", '"', ',', '.', '<', '>', '/', '?']
-   numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
- 
-   for char in lowercase_characters:
-      if char in password:
-         lowercase_characters_present = True
-   for char in uppercase_characters:
-      if char in password:
-         uppercase_characters_present = True
-   for char in special_characters:
-      if char in password:
-         special_characters_present = True
-   for char in numbers:
-      if char in password:
-         numbers_present = True
- 
-   if lowercase_characters_present == True:
-      score +=1
-
-   if uppercase_characters_present == True:
-      score +=1
-
-   if special_characters_present == True:
-      score +=1
-
-   if numbers_present == True:
-      score +=1
-
-   if len(password) >= 8:
-      score +=1
-
-   return score
-
-def password_generator(length: int, special: bool):
-   if special == "yes":
-      characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
-   else:
-      characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
-   generated_password = ""
-   for i in range(length):
-      generated_password += random.choice(characters)
-
-   return generated_password
-
 #----------------------------------Main GUI----------------------------------#
 
 def save_data():
@@ -209,17 +49,17 @@ def save_data():
       json.dump(userdata, s, indent=4)
 
 def refresh_stats():
-   ready_data = get_data()
+   data = password_manager.get_data(key)
    global total_passwords_value
-   total_passwords_value = len(ready_data)
+   total_passwords_value = len(data)
    total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords_value))
 
 def refresh_treeview():
    for item in tree.get_children():
       tree.delete(item)
 
-   ready_data = get_data()
-   for line in ready_data:
+   data = password_manager.get_data(key)
+   for line in data:
       modified_line = list(line)
       modified_line[3] = "••••••••"
       modified_line = tuple(modified_line)
@@ -242,7 +82,7 @@ def add_password_gui(root, tree):
       username = username_text_box.get()
       password = password_text_box.get()
 
-      add_password(name, username, password)
+      password_manager.add_password(name, username, password, key)
       refresh_treeview()
       refresh_stats()
 
@@ -265,16 +105,18 @@ def change_master_password_gui():
    def change_master_password(org_pass, new_pass1, new_pass2):
       if new_pass1 == new_pass2:
          if login_check_function(org_pass):
-            passwords = get_data()
+            data = password_manager.get_data(key)
 
             os.remove("Passwords.encryptx")
 
             login_create_function(new_pass1, new_pass2)
 
-            for item in passwords:
-               add_password(item[1], item[2], item[3])
+            for item in data:
+               password_manager.add_password(item[1], item[2], item[3], key)
 
             change_password_gui.destroy()
+      else:
+         CTkMessagebox(title="Error!", message="An error occured while changing password!", icon="cancel")
 
    change_button = tkinter.Button(change_password_gui, text="Change Master Password", command=lambda: change_master_password(original_password_box.get(), new_password_box.get(), new_password_box2.get()))
    change_button.pack(pady=5)
@@ -297,8 +139,8 @@ class CountThread(threading.Thread):
 
 def copy_user_or_pass(itemid, copy):
    global counting_thread
-   ready_data = get_data()
-   data = ready_data[int(itemid)]
+   data = password_manager.get_data(key)
+   data = data[int(itemid)]
 
    if copy == "user":
       user = data[2]
@@ -318,13 +160,13 @@ def copy_user_or_pass(itemid, copy):
          counting_thread.start()
 
 def show_password(tree, item):
-   ready_data = get_data()
-   data = ready_data[int(item)]
+   data_ = password_manager.get_data(key)
+   data = data_[int(item)]
 
    for item in tree.get_children():
       tree.delete(item)
 
-   for line in ready_data:
+   for line in data_:
       if line == data:
          tree.insert("", "end", values=line)
       else:
@@ -359,15 +201,15 @@ def on_right_click(event):
    if item:
       menu = tkinter.Menu(root, tearoff=0)
       autotype_menu = tkinter.Menu(menu, tearoff=0)
-      menu.add_command(label="Remove Item", command=lambda:remove_password(item_id))
+      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(item_id))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
       menu.add_command(label="Hide Password", command=lambda:refresh_treeview())
 
-      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([get_data()[int(item_id)][2], get_data()[int(item_id)][3]]))
-      autotype_menu.add_command(label="Username", command=lambda: autotype([get_data()[int(item_id)][2]]))
-      autotype_menu.add_command(label="Password", command=lambda: autotype([get_data()[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][2], password_manager.get_data(key)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][2]]))
+      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][3]]))
 
       menu.add_cascade(label="Auto Type", menu=autotype_menu)
       menu.tk_popup(event.x_root, event.y_root)
@@ -464,7 +306,7 @@ def decrypt(entered_key):
 def slider_event(value):
    global password_generated
    special = use_special.get()
-   password_generated = password_generator(int(value), special)
+   password_generated = password_manager.password_generator(int(value), special)
    length_set.configure(text=f"Password Length: {int(value)}")
    password_generated_label.configure(text=f"Password: {password_generated}")
    
@@ -472,7 +314,7 @@ def checkbox_event():
    global length, password_generated
    length = slider.get()
    special = use_special.get()
-   password_generated = password_generator(int(length), special)
+   password_generated = password_manager.password_generator(int(length), special)
    password_generated_label.configure(text=f"Password: {password_generated}")
 
 def main_gui():
@@ -496,7 +338,7 @@ def main_gui():
    # Password Page   
 
    try: 
-      ready_data = get_data()
+      data = password_manager.get_data(key)
    except:
       pass  
 
@@ -596,7 +438,7 @@ def main_gui():
    title_stats.pack(pady=15, padx=10)
 
    global total_passwords_label
-   total_passwords_value = len(ready_data)
+   total_passwords_value = len(data)
    total_passwords_label = customtkinter.CTkLabel(master=tabview.tab("Stats"), text=("Passwords Saved ~> ", total_passwords_value), font=("Cascadia Code", 12))
    total_passwords_label.pack(pady=(10,5), padx=5)
 
@@ -726,9 +568,7 @@ def login_gui():
 #----------------------------------Boot----------------------------------#
 
 def boot():
-   global crypto_handler, userdata
-
-   crypto_handler = CryptoHandler()
+   global userdata
 
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
