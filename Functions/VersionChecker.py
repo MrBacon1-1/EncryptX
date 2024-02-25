@@ -11,7 +11,7 @@ class VersionChecker:
 
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.content, "html.parser")
-                    latest_release_tag = soup.find("a", class_="Link--primary")  # Example class name, replace with the correct one
+                    latest_release_tag = soup.find("a", class_="Link--primary")
 
                     if latest_release_tag:
                         latest_tag_name = latest_release_tag.text.strip()
