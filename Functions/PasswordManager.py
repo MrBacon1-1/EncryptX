@@ -7,6 +7,7 @@ class PasswordManager:
     def __init__(self):
         self.crypto_handler = CryptoHandler()
         
+
     def get_data(self, key: bytes):
         data = []
 
@@ -32,6 +33,7 @@ class PasswordManager:
 
         return data
 
+
     def add_password(self, url_or_program: str, user: str, password: str, key: bytes):
         password = bytes(password, "utf-8")
         user = bytes(user, "utf-8")
@@ -43,6 +45,7 @@ class PasswordManager:
         with open("Passwords.encryptx", "ab") as p:
             p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")
 
+
     def remove_password(self, index: int):
         with open("Passwords.encryptX", "rb") as read:
             lines = read.readlines()
@@ -51,6 +54,7 @@ class PasswordManager:
             for index_of_line, line in enumerate(lines):
                 if index_of_line != int(index):
                     write.write(line)
+
 
     def password_rating_check(self, password: str):
         score = 0
@@ -86,6 +90,7 @@ class PasswordManager:
             score += 1
 
         return score
+
 
     def password_generator(self, length: int, special: bool):
         if special == "yes":

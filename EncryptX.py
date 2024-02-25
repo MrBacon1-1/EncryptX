@@ -16,13 +16,15 @@ import pyperclip
 from CTkMessagebox import CTkMessagebox
 from Functions.CryptoHandler import CryptoHandler
 from Functions.PasswordManager import PasswordManager
+from Functions.VersionChecker import VersionChecker
 
 crypto_handler = CryptoHandler()
 password_manager = PasswordManager()
+version_checker = VersionChecker()
 
 #----------------------------------Constants----------------------------------#
 
-version = "v1.2.0a"
+version = "1.2.1a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -42,7 +44,7 @@ def exit_bind():
    gc.collect()
    os._exit(0)
 
-#----------------------------------Main GUI----------------------------------#
+#----------------------------------Functions----------------------------------#
 
 def save_data():
    with open("userData.json", "w") as s:
@@ -247,62 +249,6 @@ def combobox_callback(choice):
 
    save_data()
 
-def encrypt(entered_key):
-   generated_key = crypto_handler.generate_key(entered_key)
-   path = tkinter.filedialog.askopenfilename()
-
-   if len(path) == 0:
-      return
-   
-   if path.endswith('.encryptx'):
-      return
-   
-   with open(path, "rb") as f:
-      lines = f.readlines()
-      f.close
-
-   with open(path, "wb") as f:
-      f.write(b"")
-      f.close
-
-   with open(path, "ab") as f:
-      for line in lines:
-         encrypted_line = crypto_handler.encryption(generated_key, line)
-         f.write(encrypted_line.encode() + b"\n")
-
-   os.rename(path, (path + ".encryptx"))
-
-def decrypt(entered_key):
-   generated_key = crypto_handler.generate_key(entered_key)
-   path = tkinter.filedialog.askopenfilename()
-
-   if len(path) == 0:
-      return
-   
-   if not path.endswith('.encryptx'):
-      return
-   
-   with open(path, "rb") as f:
-      lines = f.readlines()
-      f.close
-
-   with open(path, "wb") as f:
-      f.write(b"")
-      f.close
-
-   with open(path, "ab") as f:
-      fail = False
-      for line in lines:
-         try:
-            decrypted_line = crypto_handler.decryption(generated_key, line)
-            f.write(decrypted_line)
-         except:
-            f.write(line)
-            fail = True
-
-   if not fail:
-      os.rename(path, path[:-len(".encryptx")])
-
 def slider_event(value):
    global password_generated
    special = use_special.get()
@@ -317,14 +263,18 @@ def checkbox_event():
    password_generated = password_manager.password_generator(int(length), special)
    password_generated_label.configure(text=f"Password: {password_generated}")
 
+#----------------------------------Main GUI----------------------------------#
+
 def main_gui():
    global root, tree
 
    keyboard.add_hotkey('Ctrl+Alt+L', lock_bind)
 
+   result = version_checker.compare_versions(version)
+
    root = customtkinter.CTk()
    root.geometry("1400x800")
-   root.title(f"EncryptX {version}")
+   root.title(f"EncryptX | v{version} | {result}")
 
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
@@ -390,10 +340,10 @@ def main_gui():
    key_entry_box = customtkinter.CTkEntry(master=tabview.tab("Crypto Tool"), placeholder_text="Key", font=("Cascadia Code", 16))
    key_entry_box.pack(pady=(20,5), padx=5)
 
-   encrypt_button = customtkinter.CTkButton(master=tabview.tab("Crypto Tool"), text="Encrypt File", font=("Cascadia Code", 16), command=lambda: encrypt(key_entry_box.get()))
+   encrypt_button = customtkinter.CTkButton(master=tabview.tab("Crypto Tool"), text="Encrypt File", font=("Cascadia Code", 16), command=lambda: crypto_handler.encrypt_file(key_entry_box.get()))
    encrypt_button.pack(pady=5, padx=5)
 
-   decrypt_button = customtkinter.CTkButton(master=tabview.tab("Crypto Tool"), text="Decrypt File", font=("Cascadia Code", 16), command=lambda: decrypt(key_entry_box.get()))
+   decrypt_button = customtkinter.CTkButton(master=tabview.tab("Crypto Tool"), text="Decrypt File", font=("Cascadia Code", 16), command=lambda: crypto_handler.decrypt_file(key_entry_box.get()))
    decrypt_button.pack(pady=5, padx=5)
 
    # Password Generator
@@ -568,10 +518,9 @@ def login_gui():
 #----------------------------------Boot----------------------------------#
 
 def boot():
-   global userdata
-
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
+   global userdata
    userdata = {
       "masterpass": {
          "password": ""

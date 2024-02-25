@@ -1,5 +1,6 @@
 import os
 import base64
+import tkinter
 from cryptography.hazmat.primitives import hashes, padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -22,6 +23,7 @@ class CryptoHandler():
 
 		return key
 
+
 	def encryption(self, key: bytes, plaintext: bytes):
 		try:
 			iv = os.urandom(16)
@@ -41,6 +43,7 @@ class CryptoHandler():
 		except Exception as e:
 			print("Error Encrypting! " + str(e))
 
+
 	def decryption(self, key: bytes, ciphertext: bytes):
 		try:
 			ciphertext = base64.b64decode(ciphertext)
@@ -59,3 +62,61 @@ class CryptoHandler():
 
 		except Exception as e:
 			print("Error Decrypting! " + str(e))
+
+
+	def encrypt_file(self, entered_key: str):
+		generated_key = self.generate_key(entered_key)
+		path = tkinter.filedialog.askopenfilename()
+
+		if len(path) == 0:
+			return
+
+		if path.endswith('.encryptx'):
+			return
+
+		with open(path, "rb") as f:
+			lines = f.readlines()
+			f.close
+
+		with open(path, "wb") as f:
+			f.write(b"")
+			f.close
+
+		with open(path, "ab") as f:
+			for line in lines:
+				encrypted_line = self.encryption(generated_key, line)
+				f.write(encrypted_line.encode() + b"\n")
+
+		os.rename(path, (path + ".encryptx"))
+
+
+	def decrypt_file(self, entered_key: str):
+		generated_key = self.generate_key(entered_key)
+		path = tkinter.filedialog.askopenfilename()
+
+		if len(path) == 0:
+			return
+
+		if not path.endswith('.encryptx'):
+			return
+
+		with open(path, "rb") as f:
+			lines = f.readlines()
+			f.close
+
+		with open(path, "wb") as f:
+			f.write(b"")
+			f.close
+
+		with open(path, "ab") as f:
+			fail = False
+			for line in lines:
+				try:
+					decrypted_line = self.decryption(generated_key, line)
+					f.write(decrypted_line)
+				except:
+					f.write(line)
+					fail = True
+
+		if not fail:
+			os.rename(path, path[:-len(".encryptx")])
