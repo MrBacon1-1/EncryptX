@@ -274,7 +274,7 @@ def main_gui():
 
    root = customtkinter.CTk()
    root.geometry("1400x800")
-   root.title(f"EncryptX | v{version} | {result}")
+   root.title(f"EncryptX | v{version} {result}")
 
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)

@@ -16,9 +16,11 @@ class VersionChecker:
                     if latest_release_tag:
                         latest_tag_name = latest_release_tag.text.strip()
                         if version < latest_tag_name:
-                            return "Update Available"
+                            return "| Update Available"
+                        if version > latest_tag_name:
+                            return "| DEV"
                         else:
-                            return "DEV"
+                            return ""
                 else:
                     return f"[VersionChecker] Failed to retrieve latest tag information. Status code: {response.status_code}"
 
