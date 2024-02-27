@@ -22,7 +22,7 @@ class VersionChecker:
                         else:
                             return ""
                 else:
-                    return f"[VersionChecker] Failed to retrieve latest tag information. Status code: {response.status_code}"
+                    return f"| [VersionChecker] Failed to retrieve latest tag information. Status code: {response.status_code}"
 
             except:
                 pass
