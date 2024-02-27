@@ -17,14 +17,18 @@ from CTkMessagebox import CTkMessagebox
 from Functions.CryptoHandler import CryptoHandler
 from Functions.PasswordManager import PasswordManager
 from Functions.VersionChecker import VersionChecker
+from Functions.LoginManager import LoginManager
+from Functions.Utilities import Utilities
 
 crypto_handler = CryptoHandler()
 password_manager = PasswordManager()
 version_checker = VersionChecker()
+login_manager = LoginManager()
+utils = Utilities()
 
 #----------------------------------Constants----------------------------------#
 
-version = "1.2.1a"
+version = "1.2.2a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -46,27 +50,11 @@ def exit_bind():
 
 #----------------------------------Functions----------------------------------#
 
-def save_data():
-   with open("userData.json", "w") as s:
-      json.dump(userdata, s, indent=4)
-
 def refresh_stats():
    data = password_manager.get_data(key)
    global total_passwords_value
    total_passwords_value = len(data)
    total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords_value))
-
-def refresh_treeview():
-   for item in tree.get_children():
-      tree.delete(item)
-
-   data = password_manager.get_data(key)
-   for line in data:
-      modified_line = list(line)
-      modified_line[3] = "••••••••"
-      modified_line = tuple(modified_line)
-      
-      tree.insert("", "end", values=modified_line)
 
 def add_password_gui(root, tree):
    add_password_window = customtkinter.CTkToplevel(root)
@@ -85,7 +73,7 @@ def add_password_gui(root, tree):
       password = password_text_box.get()
 
       password_manager.add_password(name, username, password, key)
-      refresh_treeview()
+      password_manager.refresh_treeview(tree, key)
       refresh_stats()
 
       add_password_window.destroy()
@@ -106,17 +94,22 @@ def change_master_password_gui():
 
    def change_master_password(org_pass, new_pass1, new_pass2):
       if new_pass1 == new_pass2:
-         if login_check_function(org_pass):
+         if login_manager.check_login(org_pass, userdata) != "":
             data = password_manager.get_data(key)
 
             os.remove("Passwords.encryptx")
 
-            login_create_function(new_pass1, new_pass2)
+            new_key = login_manager.create_login(new_pass1, new_pass2, userdata)
 
             for item in data:
-               password_manager.add_password(item[1], item[2], item[3], key)
+               password_manager.add_password(item[1], item[2], item[3], new_key)
 
             change_password_gui.destroy()
+
+            gc.collect()
+            os.execl(sys.executable, sys.executable, *sys.argv)
+         else:
+            CTkMessagebox(title="Error!", message="An error occured while changing password!", icon="cancel")
       else:
          CTkMessagebox(title="Error!", message="An error occured while changing password!", icon="cancel")
 
@@ -203,11 +196,11 @@ def on_right_click(event):
    if item:
       menu = tkinter.Menu(root, tearoff=0)
       autotype_menu = tkinter.Menu(menu, tearoff=0)
-      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(item_id))
+      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(tree, item_id, key))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
-      menu.add_command(label="Hide Password", command=lambda:refresh_treeview())
+      menu.add_command(label="Hide Password", command=lambda:password_manager.refresh_treeview(tree, key))
 
       autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][2], password_manager.get_data(key)[int(item_id)][3]]))
       autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][2]]))
@@ -247,7 +240,7 @@ def combobox_callback(choice):
       except:
          pass
 
-   save_data()
+   utils.save_json(userdata)
 
 def slider_event(value):
    global password_generated
@@ -314,7 +307,7 @@ def main_gui():
    tree.heading("Password", text="Password")
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
-   refresh_treeview()
+   password_manager.refresh_treeview(tree, key)
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
@@ -329,7 +322,7 @@ def main_gui():
    add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=refresh_treeview)
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: password_manager.refresh_treeview(tree, key))
    refresh_button.pack() 
 
    # Cryptography Tool
@@ -426,50 +419,33 @@ def main_gui():
 
 #----------------------------------Login Functions----------------------------------#
 
-def login_check_function(master_pass):
+def handle_login(password_box, login_gui):
    global key
 
-   key = crypto_handler.generate_key(master_pass)
+   result = login_manager.check_login(password_box, userdata)
 
-   decrypted_password = crypto_handler.decryption(key, userdata["masterpass"]["password"])
-   if decrypted_password != None:
-      if decrypted_password.decode("utf-8") == master_pass:
-         return True
-      else:
-         return False
-             
-def login_create_function(master_pass, second_entry):
-   global key
+   if result != "":
+      global key
+      key = result
 
-   if master_pass != second_entry:
-      return False
-
-   key = crypto_handler.generate_key(master_pass)
-   encoded_password = bytes(master_pass, "utf-8")
-   encrypted_password = crypto_handler.encryption(key, encoded_password)
-
-   userdata["masterpass"]["password"] = encrypted_password
-   save_data()
-
-   return True
-
-def login_check(master_pass):
-   if login_check_function(master_pass):
-      login.destroy()
+      login_gui.destroy()
       main_gui()
    else:
       CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
-def login_create(master_pass, second_entry):
-   if login_create_function(master_pass, second_entry):
-      login.destroy()
+def handle_login_create(password1, password2, login_gui):
+   result = login_manager.create_login(password1, password2, userdata)
+
+   if result != "":
+      global key
+      key = result
+
+      login_gui.destroy()
       main_gui()
    else:
-      CTkMessagebox(title="Error!", message="Mismatched Password!", icon="cancel")
+      CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
-def login_creation_gui():
-   global login
-
+def create_login_gui():
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
@@ -487,14 +463,12 @@ def login_creation_gui():
    password_box.pack(pady=5, padx=5)
    second_password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Create Account", font=("Cascadia Code", 14), command=lambda:login_create(password_box.get(), second_password_box.get()))
+   button = customtkinter.CTkButton(master=login, text="Create Account", font=("Cascadia Code", 14), command=lambda: handle_login_create(password_box.get(), second_password_box.get(), login))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
 
 def login_gui():
-   global login
-
    hwnd = ctypes.windll.kernel32.GetConsoleWindow()
    if hwnd:
       ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
@@ -510,7 +484,7 @@ def login_gui():
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*", width=250)
    password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda:login_check(password_box.get()))
+   button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda: handle_login(password_box.get(), login))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
@@ -549,7 +523,7 @@ def boot():
       new_user = True
 
    if new_user == True:
-      login_creation_gui()
+      create_login_gui()
    elif new_user == False:
       login_gui()
 
