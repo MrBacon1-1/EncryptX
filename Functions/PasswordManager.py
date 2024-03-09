@@ -1,4 +1,3 @@
-import os
 import base64
 import random
 from Functions.CryptoHandler import CryptoHandler
@@ -6,15 +5,13 @@ from Functions.CryptoHandler import CryptoHandler
 crypto_handler = CryptoHandler()
 
 class PasswordManager:      
-    def get_data(self, key: bytes):
+    def get_data(self, vault_name: str, key: bytes):
         data = []
 
-        if os.path.isfile("Passwords.encryptx") != True:
-            with open("Passwords.encryptx", "w"):
-                pass
-
-        with open("Passwords.encryptx", "rb") as read:
-            split_data = read.read().split(b"\n")
+        with open(f"{vault_name}.encryptx", "rb") as r:
+            r.readline()
+            split_data = r.read().split(b"\n")
+            r.close()
 
         for item in split_data:
             if item:
@@ -32,7 +29,7 @@ class PasswordManager:
         return data
 
 
-    def add_password(self, url_or_program: str, user: str, password: str, key: bytes):
+    def add_password(self, vault_name: str, url_or_program: str, user: str, password: str, key: bytes):
         password = bytes(password, "utf-8")
         user = bytes(user, "utf-8")
         url_or_program = bytes(url_or_program, "utf-8")
@@ -40,20 +37,24 @@ class PasswordManager:
         encrypted_username = (crypto_handler.encryption(key, user)).encode("utf-8")
         encrypted_url_or_program = (crypto_handler.encryption(key, url_or_program)).encode("utf-8")
 
-        with open("Passwords.encryptx", "ab") as p:
+        with open(f"{vault_name}.encryptx", "ab") as p:
             p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")
 
 
-    def remove_password(self, tree: str, index: int, key: bytes):
-        with open("Passwords.encryptX", "rb") as read:
-            lines = read.readlines()
+    def remove_password(self, vault_name: str, tree: str, index: int, key: bytes):
+        with open(f"{vault_name}.encryptX", "rb") as r:
+            password = r.readline()
+            lines = r.readlines()
+            r.close()
 
-        with open("Passwords.encryptX", "wb") as write:
+        with open(f"{vault_name}.encryptX", "wb") as w:
+            w.write(password)
             for index_of_line, line in enumerate(lines):
                 if index_of_line != int(index):
-                    write.write(line)
+                    w.write(line)
+            w.close()
 
-        self.refresh_treeview(tree, key)
+        self.refresh_treeview(vault_name, tree, key)
 
 
     def password_rating_check(self, password: str):
@@ -104,11 +105,11 @@ class PasswordManager:
         return generated_password
     
 
-    def refresh_treeview(self, tree, key: bytes):
+    def refresh_treeview(self, vault_name: str, tree: str, key: bytes):
         for item in tree.get_children():
             tree.delete(item)
 
-        data = self.get_data(key)
+        data = self.get_data(vault_name, key)
         for line in data:
             modified_line = list(line)
             modified_line[3] = "••••••••"

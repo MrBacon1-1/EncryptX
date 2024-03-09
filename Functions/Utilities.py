@@ -1,6 +1,6 @@
 import json
 
 class Utilities():
-    def save_json(self, userdata: str):
+    def save_json(self, settings: str):
         with open("userData.json", "w") as s:
-            json.dump(userdata, s, indent=4)
+            json.dump(settings, s, indent=4)

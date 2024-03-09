@@ -28,7 +28,7 @@ utils = Utilities()
 
 #----------------------------------Constants----------------------------------#
 
-version = "1.2.2a"
+version = "1.2.3a"
 SW_HIDE = 0
 SW_SHOW = 5
 counting_thread = None
@@ -51,7 +51,7 @@ def exit_bind():
 #----------------------------------Functions----------------------------------#
 
 def refresh_stats():
-   data = password_manager.get_data(key)
+   data = password_manager.get_data(vault, key)
    global total_passwords_value
    total_passwords_value = len(data)
    total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords_value))
@@ -72,8 +72,8 @@ def add_password_gui(root, tree):
       username = username_text_box.get()
       password = password_text_box.get()
 
-      password_manager.add_password(name, username, password, key)
-      password_manager.refresh_treeview(tree, key)
+      password_manager.add_password(vault, name, username, password, key)
+      password_manager.refresh_treeview(vault, tree, key)
       refresh_stats()
 
       add_password_window.destroy()
@@ -94,15 +94,15 @@ def change_master_password_gui():
 
    def change_master_password(org_pass, new_pass1, new_pass2):
       if new_pass1 == new_pass2:
-         if login_manager.check_login(org_pass, userdata) != "":
-            data = password_manager.get_data(key)
+         if login_manager.vault_login(vault, org_pass) != "":
+            data = password_manager.get_data(vault, key)
 
-            os.remove("Passwords.encryptx")
+            os.remove(f"{vault}.encryptx")
 
-            new_key = login_manager.create_login(new_pass1, new_pass2, userdata)
+            new_key = login_manager.create_vault(vault, new_pass1, new_pass2)
 
             for item in data:
-               password_manager.add_password(item[1], item[2], item[3], new_key)
+               password_manager.add_password(vault, item[1], item[2], item[3], new_key)
 
             change_password_gui.destroy()
 
@@ -134,7 +134,7 @@ class CountThread(threading.Thread):
 
 def copy_user_or_pass(itemid, copy):
    global counting_thread
-   data = password_manager.get_data(key)
+   data = password_manager.get_data(vault, key)
    data = data[int(itemid)]
 
    if copy == "user":
@@ -155,7 +155,7 @@ def copy_user_or_pass(itemid, copy):
          counting_thread.start()
 
 def show_password(tree, item):
-   data_ = password_manager.get_data(key)
+   data_ = password_manager.get_data(vault, key)
    data = data_[int(item)]
 
    for item in tree.get_children():
@@ -196,15 +196,15 @@ def on_right_click(event):
    if item:
       menu = tkinter.Menu(root, tearoff=0)
       autotype_menu = tkinter.Menu(menu, tearoff=0)
-      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(tree, item_id, key))
+      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(vault, tree, item_id, key))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
-      menu.add_command(label="Hide Password", command=lambda:password_manager.refresh_treeview(tree, key))
+      menu.add_command(label="Hide Password", command=lambda:password_manager.refresh_treeview(vault, tree, key))
 
-      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][2], password_manager.get_data(key)[int(item_id)][3]]))
-      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][2]]))
-      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(key)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(vault, key)[int(item_id)][2], password_manager.get_data(vault, key)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(vault, key)[int(item_id)][2]]))
+      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(vault, key)[int(item_id)][3]]))
 
       menu.add_cascade(label="Auto Type", menu=autotype_menu)
       menu.tk_popup(event.x_root, event.y_root)
@@ -218,13 +218,13 @@ def combobox_callback(choice):
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
       customtkinter.set_appearance_mode("dark")
-      userdata["settings"]["theme"] = "Dark Mode"
+      settings["settings"]["theme"] = "Dark Mode"
    elif choice == "Light Mode":
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#BFBFBF", fieldbackground="#F0F0F0", foreground="#333333")
       customtkinter.set_appearance_mode("light")
-      userdata["settings"]["theme"] = "Light Mode"
+      settings["settings"]["theme"] = "Light Mode"
 
    # Clipboard Clear Stuff
       
@@ -232,15 +232,15 @@ def combobox_callback(choice):
 
    if choice == "Dont Clear":
       duration = -1
-      userdata["settings"]["clear_password_duration"] = "-1"
+      settings["settings"]["clear_password_duration"] = "-1"
    else:
       try:
          duration = int(choice)
-         userdata["settings"]["clear_password_duration"] = choice
+         settings["settings"]["clear_password_duration"] = choice
       except:
          pass
 
-   utils.save_json(userdata)
+   utils.save_json(settings)
 
 def slider_event(value):
    global password_generated
@@ -267,7 +267,7 @@ def main_gui():
 
    root = customtkinter.CTk()
    root.geometry("1400x800")
-   root.title(f"EncryptX | v{version} {result}")
+   root.title(f"EncryptX | {vault} | v{version} {result}")
 
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
@@ -280,17 +280,14 @@ def main_gui():
 
    # Password Page   
 
-   try: 
-      data = password_manager.get_data(key)
-   except:
-      pass  
+   data = password_manager.get_data(vault, key) 
 
-   if userdata["settings"]["theme"] == "Dark Mode":
+   if settings["settings"]["theme"] == "Dark Mode":
       customtkinter.set_appearance_mode("dark")
       style = ttk.Style(root)
       style.theme_use("clam")
       style.configure("Treeview", background="#565656", fieldbackground="#060202", foreground="white")
-   elif userdata["settings"]["theme"] == "Light Mode":
+   elif settings["settings"]["theme"] == "Light Mode":
       customtkinter.set_appearance_mode("light")
       style = ttk.Style(root)
       style.theme_use("clam")
@@ -307,7 +304,7 @@ def main_gui():
    tree.heading("Password", text="Password")
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
-   password_manager.refresh_treeview(tree, key)
+   password_manager.refresh_treeview(vault, tree, key)
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
@@ -322,7 +319,7 @@ def main_gui():
    add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: password_manager.refresh_treeview(tree, key))
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: password_manager.refresh_treeview(vault, tree, key))
    refresh_button.pack() 
 
    # Cryptography Tool
@@ -352,7 +349,7 @@ def main_gui():
    length_set.pack(pady=(20,5), padx=5)
 
    global slider
-   slider = customtkinter.CTkSlider(master=tabview.tab("Password Generator"), from_=1, to=44, command=slider_event)
+   slider = customtkinter.CTkSlider(master=tabview.tab("Password Generator"), from_=1, to=100, command=slider_event)
    slider.pack(pady=(10,5), padx=5)
    slider.configure(number_of_steps=49)
    slider.set(1)
@@ -393,9 +390,9 @@ def main_gui():
    appearance_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Appearance", font=("Cascadia Code", 20))
    appearance_title.pack(pady=(10,5), padx=5)
 
-   theme_var = customtkinter.StringVar(value=userdata["settings"]["theme"])
+   theme_var = customtkinter.StringVar(value=settings["settings"]["theme"])
    theme = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dark Mode", "Light Mode"], font=("Cascadia Code", 16), command=combobox_callback, variable=theme_var)
-   theme_var.set(userdata["settings"]["theme"])
+   theme_var.set(settings["settings"]["theme"])
    theme.pack(pady=(10,5), padx=5)
 
    security_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Security", font=("Cascadia Code", 20))
@@ -408,11 +405,11 @@ def main_gui():
    duration_label.pack(pady=(10,5), padx=5)
 
    global duration
-   duration = int(userdata["settings"]["clear_password_duration"])
+   duration = int(settings["settings"]["clear_password_duration"])
 
-   duration_var = customtkinter.StringVar(value=userdata["settings"]["clear_password_duration"])
+   duration_var = customtkinter.StringVar(value=settings["settings"]["clear_password_duration"])
    duration_combobox = customtkinter.CTkComboBox(master=tabview.tab("Settings"), values=["Dont Clear", "10", "15", "20", "25", "30", "60"], font=("Cascadia Code", 16), command=combobox_callback, variable=duration_var)
-   duration_var.set(userdata["settings"]["clear_password_duration"])
+   duration_var.set(settings["settings"]["clear_password_duration"])
    duration_combobox.pack(pady=(10,5), padx=5)
 
    root.mainloop()  
@@ -422,61 +419,73 @@ def main_gui():
 def handle_login(password_box, login_gui):
    global key
 
-   result = login_manager.check_login(password_box, userdata)
+   vault_path = tkinter.filedialog.askopenfilename(filetypes=[("Encrypted Files", "*.encryptx")])
+   if vault_path:
+      vault_name = vault_path.split("/")[-1]
+      vault_name = vault_name.split(".")[0]
+   else:
+      CTkMessagebox(title="Error!", message="Invalid Vault!", icon="cancel")
+
+   try:
+      result = login_manager.vault_login(vault_name, password_box)
+   except:
+      pass
 
    if result != "":
-      global key
+      global key, vault
       key = result
+      vault = vault_name
 
       login_gui.destroy()
       main_gui()
    else:
       CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
-def handle_login_create(password1, password2, login_gui):
-   result = login_manager.create_login(password1, password2, userdata)
+def vault_create(vault_name, password1, password2, login_gui):
+   result = login_manager.create_vault(vault_name, password1, password2)
 
    if result != "":
-      global key
+      global key, vault
       key = result
+      vault = vault_name
 
       login_gui.destroy()
       main_gui()
    else:
-      CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
+      CTkMessagebox(title="Error!", message="Incorrect Password Or Invalid Vault!", icon="cancel")
 
-def create_login_gui():
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+def create_vault_gui(initial):
+   initial.destroy()
 
    login = customtkinter.CTk()
-   login.geometry("375x250")
+   login.geometry("375x300")
    login.resizable(width=0, height=0)
-   login.title(f"EncryptX {version} ~ Account Creation")
+   login.title(f"EncryptX {version} ~ Create Vault")
 
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 32))
    title.pack(pady=20, padx=5)
 
+   vault_name = customtkinter.CTkEntry(master=login, placeholder_text="Vault Name", font=("Cascadia Code", 14), width=250)
+   vault_name.pack(pady=5, padx=5)
+
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*", width=250)
-   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*", width=250)
    password_box.pack(pady=5, padx=5)
+
+   second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*", width=250)
    second_password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Create Account", font=("Cascadia Code", 14), command=lambda: handle_login_create(password_box.get(), second_password_box.get(), login))
+   button = customtkinter.CTkButton(master=login, text="Create Vault", font=("Cascadia Code", 14), command=lambda: vault_create(vault_name.get(), password_box.get(), second_password_box.get(), login))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
 
-def login_gui():
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+def login_gui(initial):
+   initial.destroy()
 
    login = customtkinter.CTk()
    login.geometry("375x200")
    login.resizable(width=0, height=0)
-   login.title(f"EncryptX {version} ~ Account Login")
+   login.title(f"EncryptX {version} ~ Open Vault")
 
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 22))
    title.pack(pady=20, padx=5)
@@ -484,48 +493,58 @@ def login_gui():
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*", width=250)
    password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Login", font=("Cascadia Code", 14), command=lambda: handle_login(password_box.get(), login))
+   button = customtkinter.CTkButton(master=login, text="Select Vault", font=("Cascadia Code", 14), command=lambda: handle_login(password_box.get(), login))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
+
+def initial_menu():
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+
+   initial = customtkinter.CTk()
+   initial.geometry("375x200")
+   initial.resizable(width=0, height=0)
+   initial.title(f"EncryptX {version}")
+
+   title = customtkinter.CTkLabel(master=initial, text="EncryptX", font=("Cascadia Code", 22))
+   title.pack(pady=20, padx=5)
+
+   button = customtkinter.CTkButton(master=initial, text="Open Vault", font=("Cascadia Code", 14), command=lambda: login_gui(initial))
+   button.pack(pady=(20,5), padx=5)
+
+   button = customtkinter.CTkButton(master=initial, text="Create Vault", font=("Cascadia Code", 14), command=lambda: create_vault_gui(initial))
+   button.pack(pady=5, padx=5)
+
+   initial.mainloop()
 
 #----------------------------------Boot----------------------------------#
 
 def boot():
    keyboard.add_hotkey('Ctrl+Alt+E', exit_bind)
 
-   global userdata
-   userdata = {
-      "masterpass": {
-         "password": ""
-      },
+   global settings
+   settings = {
       "settings": {
          "theme": "Dark Mode",
          "clear_password_duration": "15"
-      }
+      },
    }
 
-   if not os.path.exists("userData.json"):
-      with open("userData.json", "w") as s:
-         json.dump(userdata, s, indent=4)
+   if not os.path.exists("Settings.json"):
+      with open("Settings.json", "w") as s:
+         json.dump(settings, s, indent=4)
    else:
-      with open('userData.json', 'r') as s:
-         userdata = json.load(s)
+      with open('Settings.json', 'r') as s:
+         settings = json.load(s)
 
-   if userdata["settings"]["theme"] == "Dark Mode":
+   if settings["settings"]["theme"] == "Dark Mode":
       customtkinter.set_appearance_mode("dark")
-   elif userdata["settings"]["theme"] == "Light Mode":
+   elif settings["settings"]["theme"] == "Light Mode":
       customtkinter.set_appearance_mode("light")
 
-   if os.path.exists("userData.json") and userdata["masterpass"]["password"] != "":
-      new_user = False
-   else:
-      new_user = True
-
-   if new_user == True:
-      create_login_gui()
-   elif new_user == False:
-      login_gui()
+   initial_menu()
 
 if __name__=="__main__":
    boot()
