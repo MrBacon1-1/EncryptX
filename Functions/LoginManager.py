@@ -1,3 +1,4 @@
+import os
 from Functions.CryptoHandler import CryptoHandler
 from Functions.Utilities import Utilities
 
@@ -5,10 +6,10 @@ crypto_handler = CryptoHandler()
 utils = Utilities()
 
 class LoginManager():
-    def vault_login(self, vault_name: str, master_pass: str):
+    def vault_login(self, vault_path: str, master_pass: str):
         key = crypto_handler.generate_key(master_pass)
 
-        with open(f"{vault_name}.encryptx", "r") as r:
+        with open(vault_path, "r") as r:
             encrypted_password = r.readline()
             r.close()
 
@@ -22,12 +23,15 @@ class LoginManager():
     def create_vault(self, vault_name: str, master_pass: str, second_entry: str):
         if master_pass != second_entry:
             return ""
+        
+        if os.path.exists(vault_name + ".XVault"):
+            return ""
 
         key = crypto_handler.generate_key(master_pass)
         encoded_password = bytes(master_pass, "utf-8")
         encrypted_password = crypto_handler.encryption(key, encoded_password)
 
-        with open(f"{vault_name}.encryptx", "w") as w:
+        with open(vault_name + ".XVault", "w") as w:
             w.write(encrypted_password + "\n")
             w.close()
 

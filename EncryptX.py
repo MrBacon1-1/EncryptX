@@ -51,7 +51,7 @@ def exit_bind():
 #----------------------------------Functions----------------------------------#
 
 def refresh_stats():
-   data = password_manager.get_data(vault, key)
+   data = password_manager.get_data(vault_path, key)
    global total_passwords_value
    total_passwords_value = len(data)
    total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords_value))
@@ -72,8 +72,8 @@ def add_password_gui(root, tree):
       username = username_text_box.get()
       password = password_text_box.get()
 
-      password_manager.add_password(vault, name, username, password, key)
-      password_manager.refresh_treeview(vault, tree, key)
+      password_manager.add_password(vault_path, name, username, password, key)
+      password_manager.refresh_treeview(vault_path, tree, key)
       refresh_stats()
 
       add_password_window.destroy()
@@ -94,15 +94,16 @@ def change_master_password_gui():
 
    def change_master_password(org_pass, new_pass1, new_pass2):
       if new_pass1 == new_pass2:
-         if login_manager.vault_login(vault, org_pass) != "":
-            data = password_manager.get_data(vault, key)
+         if login_manager.vault_login(vault_path, org_pass) != "":
+            data = password_manager.get_data(vault_path, key)
 
-            os.remove(f"{vault}.encryptx")
+            os.remove(vault_path)
 
-            new_key = login_manager.create_vault(vault, new_pass1, new_pass2)
+            new_key = login_manager.create_vault(vault_name, new_pass1, new_pass2)
+            new_path = vault_name + ".XVault"
 
             for item in data:
-               password_manager.add_password(vault, item[1], item[2], item[3], new_key)
+               password_manager.add_password(new_path, item[1], item[2], item[3], new_key)
 
             change_password_gui.destroy()
 
@@ -134,7 +135,7 @@ class CountThread(threading.Thread):
 
 def copy_user_or_pass(itemid, copy):
    global counting_thread
-   data = password_manager.get_data(vault, key)
+   data = password_manager.get_data(vault_path, key)
    data = data[int(itemid)]
 
    if copy == "user":
@@ -155,7 +156,7 @@ def copy_user_or_pass(itemid, copy):
          counting_thread.start()
 
 def show_password(tree, item):
-   data_ = password_manager.get_data(vault, key)
+   data_ = password_manager.get_data(vault_path, key)
    data = data_[int(item)]
 
    for item in tree.get_children():
@@ -196,15 +197,15 @@ def on_right_click(event):
    if item:
       menu = tkinter.Menu(root, tearoff=0)
       autotype_menu = tkinter.Menu(menu, tearoff=0)
-      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(vault, tree, item_id, key))
+      menu.add_command(label="Remove Item", command=lambda:password_manager.remove_password(vault_path, tree, item_id, key))
       menu.add_command(label="Copy Username", command=lambda:copy_user_or_pass(item_id, copy="user"))
       menu.add_command(label="Copy Password", command=lambda:copy_user_or_pass(item_id, copy="pass"))
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
-      menu.add_command(label="Hide Password", command=lambda:password_manager.refresh_treeview(vault, tree, key))
+      menu.add_command(label="Hide Password", command=lambda:password_manager.refresh_treeview(vault_path, tree, key))
 
-      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(vault, key)[int(item_id)][2], password_manager.get_data(vault, key)[int(item_id)][3]]))
-      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(vault, key)[int(item_id)][2]]))
-      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(vault, key)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(vault_path, key)[int(item_id)][2], password_manager.get_data(vault_path, key)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(vault_path, key)[int(item_id)][2]]))
+      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(vault_path, key)[int(item_id)][3]]))
 
       menu.add_cascade(label="Auto Type", menu=autotype_menu)
       menu.tk_popup(event.x_root, event.y_root)
@@ -267,7 +268,7 @@ def main_gui():
 
    root = customtkinter.CTk()
    root.geometry("1400x800")
-   root.title(f"EncryptX | {vault} | v{version} {result}")
+   root.title(f"EncryptX | {vault_name} | v{version} {result}")
 
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
@@ -280,7 +281,7 @@ def main_gui():
 
    # Password Page   
 
-   data = password_manager.get_data(vault, key) 
+   data = password_manager.get_data(vault_path, key) 
 
    if settings["settings"]["theme"] == "Dark Mode":
       customtkinter.set_appearance_mode("dark")
@@ -304,7 +305,7 @@ def main_gui():
    tree.heading("Password", text="Password")
    tree.heading("Password_Rating", text="Password Rating (1-5)")  
 
-   password_manager.refresh_treeview(vault, tree, key)
+   password_manager.refresh_treeview(vault_path, tree, key)
 
    tree.column("ID", anchor="center")
    tree.column("Name/URL", anchor="center")
@@ -319,7 +320,7 @@ def main_gui():
    add_password_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Add Password", font=("Cascadia Code", 12), command=lambda: add_password_gui(root, tree))
    add_password_button.pack(pady=(10,5), padx=5)
 
-   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: password_manager.refresh_treeview(vault, tree, key))
+   refresh_button = customtkinter.CTkButton(master=tabview.tab("Passwords"), text="Refresh Passwords List", font=("Cascadia Code", 12), command=lambda: password_manager.refresh_treeview(vault_path, tree, key))
    refresh_button.pack() 
 
    # Cryptography Tool
@@ -417,42 +418,40 @@ def main_gui():
 #----------------------------------Login Functions----------------------------------#
 
 def handle_login(password_box, login_gui):
-   global key
+   global key, vault_path
 
-   vault_path = tkinter.filedialog.askopenfilename(filetypes=[("Encrypted Files", "*.encryptx")])
-   if vault_path:
-      vault_name = vault_path.split("/")[-1]
-      vault_name = vault_name.split(".")[0]
-   else:
+   vault_path = tkinter.filedialog.askopenfilename(filetypes=[("EncryptX Vault", "*.XVault")])
+   if not vault_path:
       CTkMessagebox(title="Error!", message="Invalid Vault!", icon="cancel")
 
    try:
-      result = login_manager.vault_login(vault_name, password_box)
+      result = login_manager.vault_login(vault_path, password_box)
    except:
       pass
 
    if result != "":
-      global key, vault
+      global key, vault_name
       key = result
-      vault = vault_name
+      vault_name = vault_path.split("/")[-1]
 
       login_gui.destroy()
       main_gui()
    else:
       CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
-def vault_create(vault_name, password1, password2, login_gui):
-   result = login_manager.create_vault(vault_name, password1, password2)
+def vault_create(vault, password1, password2, login_gui):
+   result = login_manager.create_vault(vault, password1, password2)
 
    if result != "":
-      global key, vault
+      global key, vault_name, vault_path
       key = result
-      vault = vault_name
+      vault_name = vault
+      vault_path = vault_name + ".XVault"
 
       login_gui.destroy()
       main_gui()
    else:
-      CTkMessagebox(title="Error!", message="Incorrect Password Or Invalid Vault!", icon="cancel")
+      CTkMessagebox(title="Error!", message="Mismatched Password Or Invalid Vault Or Vault Already Exists!", icon="cancel")
 
 def create_vault_gui(initial):
    initial.destroy()
@@ -465,8 +464,8 @@ def create_vault_gui(initial):
    title = customtkinter.CTkLabel(master=login, text="EncryptX", font=("Cascadia Code", 32))
    title.pack(pady=20, padx=5)
 
-   vault_name = customtkinter.CTkEntry(master=login, placeholder_text="Vault Name", font=("Cascadia Code", 14), width=250)
-   vault_name.pack(pady=5, padx=5)
+   vault_name_box = customtkinter.CTkEntry(master=login, placeholder_text="Vault Name", font=("Cascadia Code", 14), width=250)
+   vault_name_box.pack(pady=5, padx=5)
 
    password_box = customtkinter.CTkEntry(master=login, placeholder_text="Password", font=("Cascadia Code", 14), show="*", width=250)
    password_box.pack(pady=5, padx=5)
@@ -474,7 +473,7 @@ def create_vault_gui(initial):
    second_password_box = customtkinter.CTkEntry(master=login, placeholder_text="Re-Enter Password", font=("Cascadia Code", 14), show="*", width=250)
    second_password_box.pack(pady=5, padx=5)
 
-   button = customtkinter.CTkButton(master=login, text="Create Vault", font=("Cascadia Code", 14), command=lambda: vault_create(vault_name.get(), password_box.get(), second_password_box.get(), login))
+   button = customtkinter.CTkButton(master=login, text="Create Vault", font=("Cascadia Code", 14), command=lambda: vault_create(vault_name_box.get(), password_box.get(), second_password_box.get(), login))
    button.pack(pady=20, padx=5)
 
    login.mainloop()
@@ -499,9 +498,9 @@ def login_gui(initial):
    login.mainloop()
 
 def initial_menu():
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   # if hwnd:
+   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    initial = customtkinter.CTk()
    initial.geometry("375x200")
