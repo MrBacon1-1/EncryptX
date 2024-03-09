@@ -498,9 +498,9 @@ def login_gui(initial):
    login.mainloop()
 
 def initial_menu():
-   # hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   # if hwnd:
-   #    ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+   if hwnd:
+      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
 
    initial = customtkinter.CTk()
    initial.geometry("375x200")
