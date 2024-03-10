@@ -1,6 +1,5 @@
 #----------------------------------Modules----------------------------------#
 
-import ctypes
 import gc
 import os
 import sys
@@ -28,9 +27,7 @@ utils = Utilities()
 
 #----------------------------------Constants----------------------------------#
 
-version = "1.2.3a"
-SW_HIDE = 0
-SW_SHOW = 5
+version = "1.2.4a"
 counting_thread = None
 
 #----------------------------------Keybinds----------------------------------#
@@ -52,9 +49,8 @@ def exit_bind():
 
 def refresh_stats():
    data = password_manager.get_data(vault_path, key)
-   global total_passwords_value
-   total_passwords_value = len(data)
-   total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords_value))
+   total_passwords = len(data)
+   total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords))
 
 def add_password_gui(root, tree):
    add_password_window = customtkinter.CTkToplevel(root)
@@ -129,9 +125,7 @@ class CountThread(threading.Thread):
          time.sleep(1)
 
       if count == 0:
-         ctypes.windll.user32.OpenClipboard(0)
-         ctypes.windll.user32.EmptyClipboard()
-         ctypes.windll.user32.CloseClipboard()
+         utils.clear_clipboard()
 
 def copy_user_or_pass(itemid, copy):
    global counting_thread
@@ -379,8 +373,8 @@ def main_gui():
    title_stats.pack(pady=15, padx=10)
 
    global total_passwords_label
-   total_passwords_value = len(data)
-   total_passwords_label = customtkinter.CTkLabel(master=tabview.tab("Stats"), text=("Passwords Saved ~> ", total_passwords_value), font=("Cascadia Code", 12))
+   total_passwords = len(data)
+   total_passwords_label = customtkinter.CTkLabel(master=tabview.tab("Stats"), text=("Passwords Saved ~> ", total_passwords), font=("Cascadia Code", 12))
    total_passwords_label.pack(pady=(10,5), padx=5)
 
    # Settings Page
@@ -413,21 +407,31 @@ def main_gui():
    duration_var.set(settings["settings"]["clear_password_duration"])
    duration_combobox.pack(pady=(10,5), padx=5)
 
+   dev_title = customtkinter.CTkLabel(master=tabview.tab("Settings"), text="Developer", font=("Cascadia Code", 20))
+   dev_title.pack(pady=(10,5), padx=5)
+
+   use_console = customtkinter.CTkCheckBox(master=tabview.tab("Settings"), text="Show Console?", onvalue=True, offvalue=False, font=("Cascadia Code", 16), command=lambda: utils.console_visibility(use_console.get()))
+   use_console.pack(pady=(10,5), padx=5)
+
    root.mainloop()  
 
 #----------------------------------Login Functions----------------------------------#
 
-def handle_login(password_box, login_gui):
+def handle_login(password, login_gui):
    global key, vault_path
 
    vault_path = tkinter.filedialog.askopenfilename(filetypes=[("EncryptX Vault", "*.XVault")])
    if not vault_path:
       CTkMessagebox(title="Error!", message="Invalid Vault!", icon="cancel")
 
+   result = ""
+
    try:
-      result = login_manager.vault_login(vault_path, password_box)
+      result = login_manager.vault_login(vault_path, password)
+      del password
+      gc.collect()
    except:
-      pass
+      CTkMessagebox(title="Error!", message="Error In Login! [Could be incorrect password!]", icon="cancel")
 
    if result != "":
       global key, vault_name
@@ -436,10 +440,9 @@ def handle_login(password_box, login_gui):
 
       login_gui.destroy()
       main_gui()
-   else:
-      CTkMessagebox(title="Error!", message="Incorrect Password!", icon="cancel")
 
 def vault_create(vault, password1, password2, login_gui):
+   result = ""
    result = login_manager.create_vault(vault, password1, password2)
 
    if result != "":
@@ -447,6 +450,9 @@ def vault_create(vault, password1, password2, login_gui):
       key = result
       vault_name = vault
       vault_path = vault_name + ".XVault"
+
+      del password1, password2
+      gc.collect()
 
       login_gui.destroy()
       main_gui()
@@ -498,9 +504,7 @@ def login_gui(initial):
    login.mainloop()
 
 def initial_menu():
-   hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-   if hwnd:
-      ctypes.windll.user32.ShowWindow(hwnd, SW_HIDE)
+   utils.console_visibility(False)
 
    initial = customtkinter.CTk()
    initial.geometry("375x200")
