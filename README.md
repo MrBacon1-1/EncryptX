@@ -50,7 +50,7 @@ Linux & MacOS have not been tested.
 
 EncryptX v1.2.5a | Full Showcase
 
-[![Video](https://img.youtube.com/vi/KOGmjRBOgPU/0.jpg)](https://www.youtube.com/watch?v=KOGmjRBOgPU)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/KOGmjRBOgPU" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 # Donate
 
