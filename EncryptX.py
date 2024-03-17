@@ -104,7 +104,7 @@ def change_master_password_gui():
             new_path = vault_name + ".XVault"
 
             for item in data:
-               password_manager.add_password(new_path, item[1], item[2], item[3], new_key)
+               password_manager.add_password(new_path, crypto_handler.decryption(key, item[1]).decode(), crypto_handler.decryption(key, item[2]).decode(), crypto_handler.decryption(key, item[3]).decode(), new_key)
 
             change_password_gui.destroy()
 
