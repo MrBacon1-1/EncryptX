@@ -24,7 +24,8 @@
 
 1. [Features](#features)
 2. [Requirements](#requirements)
-3. [Donate](#donate)
+3. [video](#video)
+4. [Donate](#donate)
 
 # Features
 
@@ -44,6 +45,12 @@ If you are not using a pre compiled exe you will need the following:
 Operating System: 64-bit Windows 10 or Windows 11
 
 Linux & MacOS have not been tested.
+
+# Video
+
+EncryptX v1.2.5a | Full Showcase
+
+[![Video](https://img.youtube.com/vi/KOGmjRBOgPU/0.jpg)](https://www.youtube.com/watch?v=KOGmjRBOgPU)
 
 # Donate
 
