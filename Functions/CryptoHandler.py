@@ -82,10 +82,13 @@ class CryptoHandler():
 			f.write(b"")
 			f.close
 
-		with open(path, "ab") as f:
-			for line in lines:
-				encrypted_line = self.encryption(generated_key, line)
-				f.write(encrypted_line.encode() + b"\n")
+		try:
+			with open(path, "ab") as f:
+				for line in lines:
+					encrypted_line = self.encryption(generated_key, line)
+					f.write(encrypted_line.encode() + b"\n")
+		except:
+			pass
 
 		os.rename(path, (path + ".encryptx"))
 
