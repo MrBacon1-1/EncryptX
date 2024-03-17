@@ -27,7 +27,7 @@ utils = Utilities()
 
 #----------------------------------Constants----------------------------------#
 
-version = "1.2.4a"
+version = "1.2.5a"
 counting_thread = None
 
 #----------------------------------Keybinds----------------------------------#
@@ -42,13 +42,18 @@ def lock_bind():
    os.execl(sys.executable, sys.executable, *sys.argv)
 
 def exit_bind():
+   try:
+      del key
+   except:
+      pass
+
    gc.collect()
    os._exit(0)
 
 #----------------------------------Functions----------------------------------#
 
 def refresh_stats():
-   data = password_manager.get_data(vault_path, key)
+   data = password_manager.get_data(vault_path)
    total_passwords = len(data)
    total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords))
 
@@ -91,7 +96,7 @@ def change_master_password_gui():
    def change_master_password(org_pass, new_pass1, new_pass2):
       if new_pass1 == new_pass2:
          if login_manager.vault_login(vault_path, org_pass) != "":
-            data = password_manager.get_data(vault_path, key)
+            data = password_manager.get_data(vault_path)
 
             os.remove(vault_path)
 
@@ -129,15 +134,19 @@ class CountThread(threading.Thread):
 
 def copy_user_or_pass(itemid, copy):
    global counting_thread
-   data = password_manager.get_data(vault_path, key)
+   data = password_manager.get_data(vault_path)
    data = data[int(itemid)]
 
    if copy == "user":
-      user = data[2]
+      user = crypto_handler.decryption(key, data[2]).decode()
       pyperclip.copy(user)
+      del user
+      gc.collect()
    elif copy == "pass":
-      password = data[3]
+      password = crypto_handler.decryption(key, data[3]).decode()
       pyperclip.copy(password)
+      del password
+      gc.collect()
 
    if duration != -1:
       if counting_thread is None or not counting_thread.is_alive():
@@ -150,7 +159,7 @@ def copy_user_or_pass(itemid, copy):
          counting_thread.start()
 
 def show_password(tree, item):
-   data_ = password_manager.get_data(vault_path, key)
+   data_ = password_manager.get_data(vault_path)
    data = data_[int(item)]
 
    for item in tree.get_children():
@@ -158,13 +167,26 @@ def show_password(tree, item):
 
    for line in data_:
       if line == data:
+         line[1] = crypto_handler.decryption(key, line[1]).decode()
+         line[2] = crypto_handler.decryption(key, line[2]).decode()
+         line.append(password_manager.password_rating_check(crypto_handler.decryption(key, line[3]).decode()))
+         line[3] = crypto_handler.decryption(key, line[3]).decode()
          tree.insert("", "end", values=line)
+
+         del line
+         gc.collect()
       else:
          modified_line = list(line)
+         modified_line[1] = crypto_handler.decryption(key, modified_line[1]).decode()
+         modified_line[2] = crypto_handler.decryption(key, modified_line[2]).decode()
+         modified_line.append(password_manager.password_rating_check(crypto_handler.decryption(key, modified_line[3]).decode()))
          modified_line[3] = "••••••••"
          modified_line = tuple(modified_line)
 
          tree.insert("", "end", values=modified_line)
+
+         del modified_line
+         gc.collect()
 
 def autotype(items):
    msg = CTkMessagebox(title="Autotype", message=f"Auto Type In Previous Window?",
@@ -177,11 +199,11 @@ def autotype(items):
       time.sleep(1)
 
       if len(items) > 1:
-         pyautogui.typewrite(items[0], interval=0.01)
+         pyautogui.typewrite(crypto_handler.decryption(key, items[0]).decode(), interval=0.01)
          keyboard.press("tab")
-         pyautogui.typewrite(items[1], interval=0.01)
+         pyautogui.typewrite(crypto_handler.decryption(key, items[1]).decode(), interval=0.01)
       else:
-         pyautogui.typewrite(items[0], interval=0.01)
+         pyautogui.typewrite(crypto_handler.decryption(key, items[0]).decode(), interval=0.01)
 
 def on_right_click(event):
    item = tree.identify_row(event.y)
@@ -197,9 +219,9 @@ def on_right_click(event):
       menu.add_command(label="Show Password", command=lambda:show_password(tree, item_id))
       menu.add_command(label="Hide Password", command=lambda:password_manager.refresh_treeview(vault_path, tree, key))
 
-      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(vault_path, key)[int(item_id)][2], password_manager.get_data(vault_path, key)[int(item_id)][3]]))
-      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(vault_path, key)[int(item_id)][2]]))
-      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(vault_path, key)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username & Password", command=lambda: autotype([password_manager.get_data(vault_path)[int(item_id)][2], password_manager.get_data(vault_path)[int(item_id)][3]]))
+      autotype_menu.add_command(label="Username", command=lambda: autotype([password_manager.get_data(vault_path)[int(item_id)][2]]))
+      autotype_menu.add_command(label="Password", command=lambda: autotype([password_manager.get_data(vault_path)[int(item_id)][3]]))
 
       menu.add_cascade(label="Auto Type", menu=autotype_menu)
       menu.tk_popup(event.x_root, event.y_root)
@@ -263,6 +285,7 @@ def main_gui():
    root = customtkinter.CTk()
    root.geometry("1400x800")
    root.title(f"EncryptX | {vault_name} | v{version} {result}")
+   root.protocol("WM_DELETE_WINDOW", exit_bind)
 
    tabview = customtkinter.CTkTabview(root, width=1400, height=800)
    tabview.pack(pady=5,padx=5)
@@ -275,7 +298,7 @@ def main_gui():
 
    # Password Page   
 
-   data = password_manager.get_data(vault_path, key) 
+   data = password_manager.get_data(vault_path) 
 
    if settings["settings"]["theme"] == "Dark Mode":
       customtkinter.set_appearance_mode("dark")

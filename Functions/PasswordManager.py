@@ -1,3 +1,4 @@
+import gc
 import base64
 import random
 from Functions.CryptoHandler import CryptoHandler
@@ -5,7 +6,7 @@ from Functions.CryptoHandler import CryptoHandler
 crypto_handler = CryptoHandler()
 
 class PasswordManager:      
-    def get_data(self, vault_path: str, key: bytes):
+    def get_data(self, vault_path: str):
         data = []
 
         with open(vault_path, "rb") as r:
@@ -15,13 +16,9 @@ class PasswordManager:
 
         for item in split_data:
             if item:
-                url_or_program, user, password = item.split(b"04n$b3e0R5K*")
+                url_or_program, user, password = item.split(b":")
                 url_or_program, user, password = base64.b64decode(url_or_program), base64.b64decode(user), base64.b64decode(password)
-                url_or_program = crypto_handler.decryption(key, url_or_program).decode()
-                user = crypto_handler.decryption(key, user).decode()
-                password = crypto_handler.decryption(key, password).decode()
-                rating = self.password_rating_check(password)
-                data.append([url_or_program, user, password, rating])
+                data.append([url_or_program, user, password])
 
         for ind, x in enumerate(data):
             x.insert(0, ind)
@@ -38,7 +35,7 @@ class PasswordManager:
         encrypted_url_or_program = (crypto_handler.encryption(key, url_or_program)).encode("utf-8")
 
         with open(vault_path, "ab") as p:
-            p.write(base64.b64encode(encrypted_url_or_program) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_username) + b"04n$b3e0R5K*" + base64.b64encode(encrypted_password) + b"\n")
+            p.write(base64.b64encode(encrypted_url_or_program) + b":" + base64.b64encode(encrypted_username) + b":" + base64.b64encode(encrypted_password) + b"\n")
 
 
     def remove_password(self, vault_path: str, tree: str, index: int, key: bytes):
@@ -109,10 +106,16 @@ class PasswordManager:
         for item in tree.get_children():
             tree.delete(item)
 
-        data = self.get_data(vault_path, key)
+        data = self.get_data(vault_path)
         for line in data:
             modified_line = list(line)
+            modified_line[1] = crypto_handler.decryption(key, modified_line[1]).decode()
+            modified_line[2] = crypto_handler.decryption(key, modified_line[2]).decode()
+            modified_line.append(self.password_rating_check(crypto_handler.decryption(key, modified_line[3]).decode()))
             modified_line[3] = "••••••••"
             modified_line = tuple(modified_line)
            
             tree.insert("", "end", values=modified_line)
+
+            del modified_line
+            gc.collect()
