@@ -48,9 +48,7 @@ Linux & MacOS have not been tested.
 
 # Video
 
-EncryptX v1.2.5a | Full Showcase
-
-https://www.youtube.com/watch?v=KOGmjRBOgPU
+[EncryptX v1.2.5a | Full Showcase](https://www.youtube.com/watch?v=KOGmjRBOgPU)
 
 # Donate
 
