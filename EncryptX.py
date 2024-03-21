@@ -27,7 +27,7 @@ utils = Utilities()
 
 #----------------------------------Constants----------------------------------#
 
-version = "1.2.5a"
+version = "1.2.6a"
 counting_thread = None
 
 #----------------------------------Keybinds----------------------------------#
@@ -471,7 +471,7 @@ def vault_create(vault, password1, password2, login_gui):
    if result != "":
       global key, vault_name, vault_path
       key = result
-      vault_path, vault_name = vault_name + ".XVault", vault_name + ".XVault"
+      vault_path, vault_name = vault + ".XVault", vault  + ".XVault"
 
       del password1, password2
       gc.collect()
