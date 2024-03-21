@@ -1,12 +1,19 @@
 import gc
 import base64
 import random
+from CTkMessagebox import CTkMessagebox
 from Functions.CryptoHandler import CryptoHandler
+from Functions.Utilities import Utilities
 
 crypto_handler = CryptoHandler()
+utils = Utilities()
 
 class PasswordManager:      
     def get_data(self, vault_path: str):
+        if not utils.check_vault_status(vault_path):
+            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            return
+
         data = []
 
         with open(vault_path, "rb") as r:
@@ -27,6 +34,10 @@ class PasswordManager:
 
 
     def add_password(self, vault_path: str, url_or_program: str, user: str, password: str, key: bytes):
+        if not utils.check_vault_status(vault_path):
+            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            return
+        
         password = bytes(password, "utf-8")
         user = bytes(user, "utf-8")
         url_or_program = bytes(url_or_program, "utf-8")
@@ -39,6 +50,10 @@ class PasswordManager:
 
 
     def remove_password(self, vault_path: str, tree: str, index: int, key: bytes):
+        if not utils.check_vault_status(vault_path):
+            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            return
+
         with open(vault_path, "rb") as r:
             password = r.readline()
             lines = r.readlines()
@@ -103,6 +118,10 @@ class PasswordManager:
     
 
     def refresh_treeview(self, vault_path: str, tree: str, key: bytes):
+        if not utils.check_vault_status(vault_path):
+            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            return
+
         for item in tree.get_children():
             tree.delete(item)
 

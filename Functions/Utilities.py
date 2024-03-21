@@ -1,3 +1,4 @@
+import os
 import json
 import ctypes
 
@@ -23,3 +24,10 @@ class Utilities():
         ctypes.windll.user32.OpenClipboard(0)
         ctypes.windll.user32.EmptyClipboard()
         ctypes.windll.user32.CloseClipboard()
+
+
+    def check_vault_status(self, path: str):
+        if os.path.exists(path):
+            return True
+        else:
+            return False
