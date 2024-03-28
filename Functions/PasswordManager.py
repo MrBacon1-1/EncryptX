@@ -11,7 +11,7 @@ utils = Utilities()
 class PasswordManager:      
     def get_data(self, vault_path: str):
         if not utils.check_vault_status(vault_path):
-            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            print("Get Data >> Vault Not Found!")
             return
 
         data = []
@@ -35,7 +35,7 @@ class PasswordManager:
 
     def add_password(self, vault_path: str, url_or_program: str, user: str, password: str, key: bytes):
         if not utils.check_vault_status(vault_path):
-            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            print("Add Password >> Vault Not Found!")
             return
         
         password = bytes(password, "utf-8")
@@ -51,7 +51,7 @@ class PasswordManager:
 
     def remove_password(self, vault_path: str, tree: str, index: int, key: bytes):
         if not utils.check_vault_status(vault_path):
-            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            print("Remove Password >> Vault Not Found!")
             return
 
         with open(vault_path, "rb") as r:
@@ -119,7 +119,7 @@ class PasswordManager:
 
     def refresh_treeview(self, vault_path: str, tree: str, key: bytes):
         if not utils.check_vault_status(vault_path):
-            CTkMessagebox(title="Error!", message="Vault file was not found!", icon="cancel")
+            print("Refresh Tree >> Vault Not Found!")
             return
 
         for item in tree.get_children():

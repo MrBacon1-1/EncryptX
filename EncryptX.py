@@ -27,7 +27,7 @@ utils = Utilities()
 
 #----------------------------------Constants----------------------------------#
 
-version = "1.2.6a"
+version = "1.2.7"
 counting_thread = None
 
 #----------------------------------Keybinds----------------------------------#
@@ -54,7 +54,12 @@ def exit_bind():
 
 def refresh_stats():
    data = password_manager.get_data(vault_path)
-   total_passwords = len(data)
+
+   try:
+      total_passwords = len(data)
+   except:
+      total_passwords = 0
+
    total_passwords_label.configure(text=("Passwords Saved ~> ", total_passwords))
 
 def add_password_gui(root, tree):
