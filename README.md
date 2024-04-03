@@ -24,7 +24,7 @@
 
 1. [Features](#features)
 2. [Requirements](#requirements)
-3. [video](#video)
+3. [Video](#video)
 4. [Donate](#donate)
 
 # Features
