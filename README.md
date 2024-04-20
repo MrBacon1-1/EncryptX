@@ -40,7 +40,7 @@
 
 If you are not using a pre compiled exe you will need the following:
 
-`pip install cryptography pyperclip keyboard customtkinter CTkMessagebox pyautogui bs4`
+`pip install cryptography pyperclip keyboard customtkinter CTkMessagebox pyautogui bs4 requests`
 
 Operating System: 64-bit Windows 10 or Windows 11
 
